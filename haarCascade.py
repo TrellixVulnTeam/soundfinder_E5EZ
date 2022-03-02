@@ -8,41 +8,42 @@ class Person:
     potentialCounter = 1
     verifiedArray = []
     potentialArray = []
-    def __init__(self, x, y, w, h, verified, timeFirstDetected, timeLastDetected, countDetected, totalCounts, percentDetected): 
-        self.id = 0
+    def __init__(self, x, y, w, h, timeFirstDetected, timeLastDetected, seenThisRound, countDetected, totalCounts, percentDetected): 
+        self.id = Person.potentialCounter
         self.x = x
         self.y = y
         self.w = w
         self.h = h
-        self.verified = verified
-        if(verified):
-            self.id = Person.verifiedCounter
-            Person.verifiedCounter += 1
-            Person.verifiedArray.append(self.id)
-        else:
-            self.id = Person.potentialCounter
-            Person.potentialCounter += 1
-            Person.potentialArray.append(self.id)
-        self.seenThisRound = False
+        self.verified = False
         self.timeFirstDetected = timeFirstDetected
         self.timeLastDetected = timeLastDetected
+        self.seenThisRound = seenThisRound
         self.countDetected = countDetected
         self.totalCounts = totalCounts
         self.percentDetected = percentDetected
+        Person.potentialCounter += 1
+        Person.potentialArray.append(self)
     def __str__(self): 
         if(self.verified):
             return f"Verified Person {self.id}: x: {self.x} y: {self.y}"
         else:
             return f"Potential Person {self.id}: x: {self.x} y: {self.y}"
+    # Function to update timeLastDetected, countDetected, totalCounts, percentDetected, seenThisRound
+    # Given a person and one variable: either +1 for detected or -1 for not detected 
+    def updateStats(self, one):
+        if(one == 1):
+            timeLastDetected = time.time()
+        self.countDetected += one
+        self.totalCounts += 1
+        self.percentDetected = self.countDetected / self.totalCounts
+        self.seenThisRound = True
+    def verifyPerson(self):
+        self.verified  = True
+        self.id = Person.verifiedCounter
+        Person.verifiedCounter += 1
+        Person.verifiedArray.append(self.id)
 
 
-# Function to update seenThisRound, timeLastDetected, countDetected, totalCounts, percentDetected
-# Given a person and one variable: either +1 for detected or -1 for not detected 
-def updatePersonStats(person, one): 
-    person.countDetected += one
-    person.totalCounts += 1
-    person.percentDetected = person.countDetected / person.totalCounts
-    person.seenThisRound = 
 # Create people array
 # Criteria: 
 # Person if has been detected 90% of the time for > 3 seconds
@@ -51,56 +52,71 @@ def updatePersonStats(person, one):
 # Distance: 3% variablity, aka 100 and 103 are same person
 # Given x, y, w, h
 # TESTING SINCE CLOSE: 20% variability
-potentialPeople = []
-verifiedPeople = []
 smallPercent = .8
 largePercent = 1.2
 seconds = 3
-def updateArrays(x, y, w, h, potentialPeople, verifiedPeople):
-    # ADDING
+def addToArrays(x, y, w, h):
     # Check if coordinates are already in verifiedPeople array
     smallX = smallPercent * x
     largeX = largePercent * x
     smallY = smallPercent * y
     largeY = largePercent * y
     alreadyVerified = False
-    for person in verifiedPeople: 
+    for person in Person.verifiedArray: 
         if(smallX < person.x < largeX and smallY < person.y < largeY): 
             alreadyVerified = True
             break
     # If already verified
-    #   Increase their countDetected and totalCounts and percentDetected, then break out of function
+    #   Update stats 
     # If not, check if coordinates are already in potentialPeople
-    #   If already in, increase their count detected and totalCounts
-    #   If not, add them into potentialPeople
+    #   If already in, update stats
+    #   If not, add them into potentialPeople(happens in declaration)
     if(alreadyVerified):
-        for person in potentialPeople: 
+        for person in Person.verifiedArray: 
             if(smallX < person.x < largeX and smallY < person.y < largeY): 
-
+                person.updateStats(1)
+                break
     else:  
         alreadyPotential = False
-        for person in potentialPeople: 
+        for person in Person.potentialArray: 
             if(smallX < person.x < largeX and smallY < person.y < largeY): 
                 alreadyPotential = True
-                person.countDetected += 1
-                person.totalCounts += 1
-                person.percentDetected = person.countDetected / person.totalCounts
+                person.updateStats(1)
+                break
         if not alreadyPotential: 
-            newPotentialPerson = potentialPerson(x, y, w, h, time.time(), 1, 1, 1)
-            potentialPeople.append(newPotentialPerson)
+            potentialPerson = Person(x, y, w, h, time.time(), time.time(), True, 1, 1, 1)
+
+# Goes through potentialArray and verifiedArray to add any potentials into veriifed
+# and delete any non-person from potential and verified
+def updateArrays():
+    # ADDING
     # Check if any people in potentialPeople should be in verifiedPeople
-    # Not already verified, Time lived >= 3 seconds, and percentDetected > 90%  
-    for person in potentialPeople: 
+    # Not already verified, Time lived >= 3 seconds, and percentDetected >= 90% 
+    # DELETING
+    # Also check if any people in potentialPeople should be kicked
+    # Not already verified, Time since last detection >= 3s, percentDetected < 90% 
+    for person in Person.potentialArray: 
         # Make sure not already in verifiedPeople 
-        if( not person.verified and time.time() - person.timeDetected >= 3 and person.percentDetected >= .9):
-            verifiedPeople.append(Person(person.id, person.x, person.y, person.w, person.h))
+        if( not person.verified and time.time() - person.timeFirstDetected >= 3 and person.percentDetected >= .9):
+            Person.verifiedArray.append(person)
             person.verified = True
-    # DELETING 
-    # Add a time since last detection, so you can check it's been more than 3 seconds
-    # Add a verifiedThisRound so you can update counts and check if anyone disqualifies
-    # Check potentialPeople and verifiedPeople if time since last detection > 3 or percentDetected < 90% 
-    # Create only one person since verified needs more stats to determine deletion, you can include a param that says if verified or not
-    # and using that param for count and any other specifics
+            Person.potentialArray.remove(person)
+        if(not person.verified and time.time() - person.timeLastDetected >= 3 and person.percentDetected < .9): 
+            Person.potentialArray.remove(person)
+    
+    # Check if any verifiedPeople no longer belong in verified
+    # Time since last detection >= 3s, percentDetected < 90%
+    for person in Person.verifiedArray: 
+        if(time.time() - person.timeLastDetected >= 3 and person.percentDetected < .9): 
+            Person.verifiedArray.remove(person)
+
+    # For all people, both in verified and potential
+    # If not seenThisRound, then updateStats(-1) 
+    # Set seenThisRound to False for ALL to reset
+    for person in Person.verifiedArray: 
+        if(not person.seenThisRound):
+            person.updateStats(-1)
+        person.seenThisRound = False
 
 
 def detectAndDisplay(frame):
@@ -120,11 +136,10 @@ def detectAndDisplay(frame):
         # 0: img, 1: Point center, 2: Size axes, 3: double angle, 4: double startAngle, 5: double endAngle
         # 6: const Scalar & color
         frame = cv.ellipse(frame, center, (w//2, h//2), 0, 0, 360, (255, 0, 255), 4)
-        # Create person array
-        updateArrays(x, y, w, h, potentialPeople, verifiedPeople)
-
-    # for person in verifiedPeople: 
-    #     print(person)
+        # Add to person arrays
+        addToArrays(x, y, w, h)
+    # Update arrays
+    updateArrays()
     # Detect upper bodies
     bodies = body_cascade.detectMultiScale(frame_gray, 
         scaleFactor = 1.1,
@@ -136,9 +151,6 @@ def detectAndDisplay(frame):
     for(x,y,w,h) in bodies:
         bodyFound = True
         frame = cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
-        
-
     # # Zooming
     # if(bodyFound):
     #     try: 
@@ -174,8 +186,8 @@ while True:
     # if cv.waitKey(10) == 27:
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
-for person in potentialPeople: 
+for person in Person.potentialArray: 
     print(person)
-for person in verifiedPeople: 
+for person in Person.verifiedArray: 
     print(person)
     
