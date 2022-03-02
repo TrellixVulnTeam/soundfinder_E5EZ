@@ -48,6 +48,7 @@ volatile uint8_t val = 1;
 volatile uint8_t signal = 0;
 volatile uint8_t counter = 0;
 
+int8_t direction = 0;	// which way to turn; negative = left, positive = right
 void Timer0A_Handler(void) {
   TIMER0_ICR_R = TIMER_ICR_TATOCINT;    // acknowledge timer0A timeout
   PF2 ^= 0x04;                   // profile
@@ -78,12 +79,8 @@ void Timer0A_Handler(void) {
 	mic_1_avg /= time_series_1_index;
 	//repeat above block for each microphone, each with its own mic avg value
 	//compare averages
-	if(mic_1_avg > mic_2_avg){
-		// turn towards mic 1 (left)
-	}
-	else{
-		// turn towards mic 2
-	}
+	direction = mic_2_avg - mic_1_avg;
+	//turn(direction);
 	
 	//repeat for up and down mics?
 	
