@@ -19,10 +19,15 @@ void ScopeTask(void){  // called 10k/sec
   UART0_DR_R = (ADC1_SSFIFO3_R>>4); // send ADC to TExaSdisplay
 }
 
-uint32_t ADCvalue;
+uint32_t ADCvalue[2];
+uint32_t ADCdiff;
 uint8_t time_series_1_index = 0;
 uint8_t time_series_1[TIME_SERIES_LENGTH];
 uint8_t time_series_1_last_filter = 0;
+
+uint8_t time_series_2_index = 0;
+uint8_t time_series_2[TIME_SERIES_LENGTH];
+uint8_t time_series_2_last_filter = 0;
 void Timer0A_Init1KHzInt(void) {
   volatile uint32_t delay;
   DisableInterrupts();
@@ -51,11 +56,25 @@ volatile uint8_t counter = 0;
 int8_t direction = 0;	// which way to turn; negative = left, positive = right
 void Timer0A_Handler(void) {
   TIMER0_ICR_R = TIMER_ICR_TATOCINT;    // acknowledge timer0A timeout
-  PF2 ^= 0x04;                   // profile
-  ADCvalue = ADC0_InSeq3();
-	time_series_1[time_series_1_index] = (uint8_t) ADCvalue;
+  //PF2 ^= 0x04;                   // profile
+  //ADCvalue = ADC0_InSeq3();
+	
+	//ADCvalue[0] = ADC0_InSeq3();
+	//from valvanoware ADC2channel code
+	//ADC_In89 fills in ADCvalue[0] and [1] (i think)
+	 ADC_In89(ADCvalue);   // take two samples, executes in about 18.64 us
+		ADCdiff = ADCvalue[1] - ADCvalue[0];
+    //PF2 = 0x00;
+    Clock_Delay(678);     // roughly 10,000 Hz sampling, to account for 18.64 us sample time)
+  //
+	
+	time_series_1[time_series_1_index] = (uint8_t) ADCvalue[1];
 	time_series_1_index++;
-	uint16_t j = 0;
+	
+	time_series_2[time_series_1_index] = (uint8_t) ADCvalue[2];
+	time_series_2_index++;
+	//2nd mic on PE5
+	/*uint16_t j = 0;
 	if (time_series_1_index + 1 > TIME_SERIES_FILTER_LENGTH)
 		j = (time_series_1_index + 1) - TIME_SERIES_FILTER_LENGTH;
 	else j = TIME_SERIES_LENGTH + (time_series_1_index + 1 - TIME_SERIES_FILTER_LENGTH);
@@ -64,24 +83,36 @@ void Timer0A_Handler(void) {
 		//new_last_filter_val += ;
 		// avg the last few values
 		//wrap around j even if i keeps going
-	}
-	if (time_series_1_index >= TIME_SERIES_FILTER_LENGTH)
+	}*/
+	if (time_series_1_index >= TIME_SERIES_LENGTH)
 		time_series_1_index = 0;
-	
+	if (time_series_2_index >= TIME_SERIES_LENGTH)
+		time_series_2_index = 0;
 	//**evelyn's code**
 	// assuming mic 1 is left, mic 2 is on right
 	//average the adc values
 	uint16_t mic_1_avg = 0;
-	uint16_t mic_2_avg = 63;		// test value for second microphone
+	uint16_t mic_2_avg = 0;
 	for(int i = 0; i < time_series_1_index; i++){
 		mic_1_avg += time_series_1[i];
 	}
 	mic_1_avg /= time_series_1_index;
+	
+	for(int i = 0; i < time_series_2_index; i++){
+		mic_2_avg += time_series_2[i];
+	}
+	mic_2_avg /= time_series_2_index;
 	//repeat above block for each microphone, each with its own mic avg value
 	//compare averages
 	direction = mic_2_avg - mic_1_avg;
 	//turn(direction);
-	
+	PF1 = 0;
+	if(direction > 0){
+		PF1 = 0x02;	//blu
+	}
+	else{
+		PF1 = 0x04;	//red
+	}
 	//repeat for up and down mics?
 	
 	/*
@@ -105,6 +136,8 @@ void Timer0A_Handler(void) {
 	}
 	*/
 }
+
+
 int main(void) {
 	// pick one of the following three lines, all three set PLL to 80 MHz
   //PLL_Init(Bus80MHz);              // 1) call to have no TExaS debugging
@@ -117,7 +150,7 @@ int main(void) {
   PF2 = 0;                           // turn off LED
   EnableInterrupts();
   while(1) {
-    PF1 ^= 0x02;  // toggles when running in main
+    //PF1 ^= 0x02;  // toggles when running in main
   }
 }
 
