@@ -65,13 +65,13 @@ void Timer0A_Handler(void) {
 	 ADC_In89(ADCvalue);   // take two samples, executes in about 18.64 us
 		ADCdiff = ADCvalue[1] - ADCvalue[0];
     //PF2 = 0x00;
-    Clock_Delay(678);     // roughly 10,000 Hz sampling, to account for 18.64 us sample time)
+    //Clock_Delay(678);     // roughly 10,000 Hz sampling, to account for 18.64 us sample time)
   //
 	
-	time_series_1[time_series_1_index] = (uint8_t) ADCvalue[1];
+	time_series_1[time_series_1_index] = (uint8_t) ADCvalue[0];
 	time_series_1_index++;
 	
-	time_series_2[time_series_1_index] = (uint8_t) ADCvalue[2];
+	time_series_2[time_series_2_index] = (uint8_t) ADCvalue[1];
 	time_series_2_index++;
 	//2nd mic on PE5
 	/*uint16_t j = 0;
@@ -106,12 +106,14 @@ void Timer0A_Handler(void) {
 	//compare averages
 	direction = mic_2_avg - mic_1_avg;
 	//turn(direction);
-	PF1 = 0;
+	//PF1 = 0;
 	if(direction > 0){
-		PF1 = 0x02;	//blu
+		PF1 = 0x02;	//red
+		PF2 = 0;
 	}
 	else{
-		PF1 = 0x04;	//red
+		PF1 = 0;
+		PF2 = 0x04;	//blue
 	}
 	//repeat for up and down mics?
 	
@@ -146,6 +148,7 @@ int main(void) {
   
   LaunchPad_Init();                  // activate port F
   ADC0_InitSWTriggerSeq3_Ch9();      // allow time to finish activating
+	ADC_Init89(); 	//from valvanoware	pe4 and pe5
   Timer0A_Init1KHzInt();            // set up Timer0A for 100 Hz interrupts
   PF2 = 0;                           // turn off LED
   EnableInterrupts();
