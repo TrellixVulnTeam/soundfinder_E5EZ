@@ -75,11 +75,12 @@ int main(void) {
 	
 	EnableInterrupts();
 	
-	message_t dataArr[10];
+	message_t dataArr[512];
 	uint16_t dataArrIndex = 0;
 	while (1) {
 		// if there's data, transmit it
-		numSamples = UART_InUDec();
+		//numSamples = UART_InUDec();
+		numSamples = 512;
 		while(dataArrIndex < numSamples){
 			// wait for array to fill up
 			if(ADCMailbox == 1){
@@ -97,6 +98,7 @@ int main(void) {
 			// send to pc with printf
 			char message_out[50];
 			DisableInterrupts();
+			UART_OutChar('s');
 			for(int i = 0; i < numSamples; i++){
 				
 				sprintf(message_out, "%d %d %d\n", dataArr[i].id, dataArr[i].ch_1, dataArr[i].ch_2);
