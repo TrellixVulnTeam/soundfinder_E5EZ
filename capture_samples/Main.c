@@ -15,12 +15,13 @@ uint32_t ADCvalue[2];
 uint32_t count;
 
 typedef struct Message {
-	uint32_t id;
-	uint32_t ch_1;
-	uint32_t ch_2;
+	uint16_t id;
+	uint16_t ch_1;
+	uint16_t ch_2;
 } message_t;
 
-
+// set by python code via UART
+uint16_t numSamples;
 
 void Timer0A_Init1KHzInt(void) {
   volatile uint32_t delay;
@@ -74,19 +75,37 @@ int main(void) {
 	
 	EnableInterrupts();
 	
+	message_t dataArr[10];
+	uint16_t dataArrIndex = 0;
 	while (1) {
 		// if there's data, transmit it
-		if (ADCMailbox == 1) {
+		numSamples = UART_InUDec();
+		while(dataArrIndex < numSamples){
+			// wait for array to fill up
+			if(ADCMailbox == 1){
+				PF2 = 0x04;
+				dataArr[dataArrIndex].id = count;
+			
+				dataArr[dataArrIndex].ch_1 = ADCvalue[0];
+				dataArr[dataArrIndex].ch_2 = ADCvalue[1];
+				dataArrIndex++;
+				ADCMailbox = 0;
+			}
+		}
+		//if (ADCMailbox == 1) {
 			PF2 = 0x04;
 			// send to pc with printf
 			char message_out[50];
-			
-			sprintf(message_out, "%d %d %d\n", count, ADCvalue[0], ADCvalue[1]);
+			DisableInterrupts();
+			for(int i = 0; i < numSamples; i++){
+				
+				sprintf(message_out, "%d %d %d\n", dataArr[i].id, dataArr[i].ch_1, dataArr[i].ch_2);
 			
 			// printf("%d %d %d \n", count, ADCvalue[0], ADCvalue[1]);
 			
-			UART_OutString(message_out);
-			
+				UART_OutString(message_out);
+			}
+			EnableInterrupts();
 			// UART_OutUDec(count);
 			// UART_OutChar('a');
 			
@@ -100,8 +119,8 @@ int main(void) {
 			
 			PF2 = 0x00;
 			
-			ADCMailbox = 0;
+			//ADCMailbox = 0;
 			
-		}
+		//}
 	}
 }
