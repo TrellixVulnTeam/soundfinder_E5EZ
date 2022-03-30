@@ -1,3 +1,4 @@
+from cmath import pi
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.fftpack
@@ -13,14 +14,15 @@ N = 4096
 T = 1/2000 # fake sampling rate of 2000 Hz
 
 x = np.linspace(0, N*T, N)
-y = data[:,1]
+# y = data[:,1]
+y = np.sin(2*np.pi*440*x)
 
 yf = scipy.fftpack.fft(y)
-xf= np.linspace(0, 1/(2*T), N)
+xf= np.linspace(0, 1//(2*T), N//2)
 
 plt.ylabel("Amplitude")
 plt.xlabel("Frequency [Hz]")
-plt.plot(xf, yf)
+plt.plot(xf, 2/N * np.abs(yf[:N//2]))
 plt.show()
 
 
