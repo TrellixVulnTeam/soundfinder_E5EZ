@@ -28,13 +28,29 @@ class Receiver:
         if self.use_file is True:
             s = open(self.source, "rb")
         else:
-            s = serial.Serial(self.source, self.baud_rate)
+            s = serial.Serial(self.source, self.baud_rate, timeout=1, write_timeout=1)
+            # s.write("f{num_samples}".encode('utf-8'))
 
         i = 0
         data = np.zeros((num_samples, 3), dtype=np.uint)
 
+
+        # Wait for the start character
+        while True:
+            raw_data = s.readline().split()
+
+            # print(raw_data[0])
+            print(raw_data)
+            if raw_data[0] == b's':
+                break
+            
         while i < num_samples:
-            data[i] = s.readline().split()  # blocking
+
+
+            raw_data = s.readline().split()  # blocking
+            # print(raw_data)
+            data[i] = raw_data  # blocking
+            # print(data[i])
             i = i + 1
 
         s.close()
@@ -43,8 +59,15 @@ class Receiver:
 
 
 if __name__ == "__main__":
-    r = Receiver("random_data", use_file=True)
+    # r = Receiver("test_data", use_file=True)
+
+    # data = r.receive(10)
+
+    # print(data)
+
+    r = Receiver("COM27")
 
     data = r.receive(10)
-
     print(data)
+
+    np.savetxt("run1", data, delimiter=" ")
