@@ -1,5 +1,7 @@
 import numpy as np
 import serial
+import matplotlib.pyplot as plt
+import scipy.fftpack
 
 class Receiver:
     """
@@ -8,6 +10,10 @@ class Receiver:
     source = None
     use_file = None
     baud_rate = None
+
+    serial_port = None
+
+    MAX_SAMPLES = 128
 
 
 
@@ -20,40 +26,51 @@ class Receiver:
         self.use_file = use_file
         self.baud_rate = baud_rate
 
+        if self.use_file is True:
+            self.serial_port = open(self.source, "rb")
+        else:
+            self.serial_port = serial.Serial(self.source, self.baud_rate, timeout=1, write_timeout=1)
+    
+
     def receive(self, num_samples: int) -> np.array:
         """
         Receives specified number of lines of data
         """
-        s = None
-        if self.use_file is True:
-            s = open(self.source, "rb")
-        else:
-            s = serial.Serial(self.source, self.baud_rate, timeout=1, write_timeout=1)
-            # s.write("f{num_samples}".encode('utf-8'))
+
+
+        if num_samples > self.MAX_SAMPLES:
+            raise ValueError(f'Cannot receive more than {self.MAX_SAMPLES}')
 
         i = 0
         data = np.zeros((num_samples, 3), dtype=np.uint)
 
+        # print("pog")
+
+        self.serial_port.flushInput()
+
 
         # Wait for the start character
         while True:
-            raw_data = s.readline().split()
+            before_split = self.serial_port.readline()
+            # print(before_split)
+            raw_data = before_split.split()
 
             # print(raw_data[0])
-            print(raw_data)
-            if raw_data[0] == b's':
-                break
+            # print(raw_data)
+            if len(raw_data) >= 1:
+                if raw_data[0] == b's':
+                    break
             
         while i < num_samples:
 
 
-            raw_data = s.readline().split()  # blocking
+            raw_data = self.serial_port.readline().split()  # blocking
             # print(raw_data)
             data[i] = raw_data  # blocking
             # print(data[i])
             i = i + 1
 
-        s.close()
+        # s.serial_port.close()
 
         return data
 
@@ -67,7 +84,26 @@ if __name__ == "__main__":
 
     r = Receiver("COM27")
 
-    data = r.receive(10)
-    print(data)
+    data = r.receive(128)
 
-    np.savetxt("run1", data, delimiter=" ")
+    # plt.plot(data[:,1], "b")
+    # plt.plot(data[:,2], "r")
+    # plt.show()
+
+    N = 128
+
+    T = 1/2000 # fake sampling rate of 2000 Hz
+
+    x = np.linspace(0, N*T, N)
+    y = data[:,2]
+    # y = np.sin(2*np.pi*440*x)
+
+    yf = scipy.fftpack.fft(y)
+    xf= np.linspace(0, 1//(2*T), N//2)
+
+    plt.ylabel("Amplitude")
+    plt.xlabel("Frequency [Hz]")
+    plt.plot(xf, 2/N * np.abs(yf[:N//2]))
+    plt.show()
+
+    # np.savetxt("run1", data, delimiter=" ")
