@@ -5,11 +5,11 @@ import scipy.fftpack
 
 from receiver import Receiver
 
-r = Receiver("random_data", use_file=True)
+r = Receiver("sample_gen_example1.txt", use_file=True)
 
-data = r.receive(4096)
+data = r.receive(128)
 
-N = 4096
+N = 128
 
 T = 1/2000 # fake sampling rate of 2000 Hz
 
