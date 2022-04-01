@@ -11,9 +11,9 @@ mic_noise_b = 30     # %
 # simulated freq settings
 sin_freq = 440          # Hz or cycles/sec
 sampling_rate = 8       # kHz or samples/sec
-frame_size = 128        # # samples
+frame_size = 128        # #samples
 adc_resolution = 4096   # ADC range/resolution
-adc_amp_cutoff = 1896    # amplifier amplitude cutoff
+adc_amp_cutoff = 1896   # amplifier amplitude cutoff
 # calculate further settings
 frame_length = frame_size / (sampling_rate * 1000)  # ms
 mic_sample_delay_a = math.floor((mic_delay_a * frame_size) / frame_length)
@@ -50,8 +50,8 @@ with open('sample_gen_{}.txt'.format(output_name), 'w') as output_file:
 print('generated {} samples'.format(line_count))
 
 # plot signals
-plt.plot(t, y_a, color='r', label='mic A (noise {}%, delay {} ms)'.format(mic_noise_a, mic_delay_a))
-plt.plot(t, y_b, color='g', label='mic B (noise {}%, delay {} ms)'.format(mic_noise_b, mic_delay_b))
+plt.plot(t, y_a, color='r', label='mic A (noise={}%, delay={}ms or {} samples)'.format(mic_noise_a, mic_delay_a, mic_sample_delay_a))
+plt.plot(t, y_b, color='g', label='mic B (noise={}%, delay={}ms or {} samples)'.format(mic_noise_b, mic_delay_b, mic_sample_delay_b))
 plt.xlabel('sample # (t)')
 plt.ylabel('delay(sin(x) + noise)')
 plt.axis('tight')

@@ -1,7 +1,7 @@
-import numpy as np
 import serial
-import matplotlib.pyplot as plt
+import numpy as np
 import scipy.fftpack
+import matplotlib.pyplot as plt
 
 class Receiver:
     """
