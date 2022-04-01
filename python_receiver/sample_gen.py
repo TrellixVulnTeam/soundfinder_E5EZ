@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 output_name = 'example1'
 # simulated mic settings
 mic_delay_a = 0      # ms
-mic_delay_b = 0.0006 # ms
+mic_delay_b = 0.0010 # ms
 mic_noise_a = 15     # %
 mic_noise_b = 30     # %
 # simulated freq settings
