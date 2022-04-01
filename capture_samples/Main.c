@@ -35,7 +35,7 @@ void Timer0A_Init1KHzInt(void) {
                                    // configure for periodic mode
   TIMER0_TAMR_R = TIMER_TAMR_TAMR_PERIOD;
   // TIMER0_TAILR_R = 79999;         // start value for 1 KHz interrupts (was 79999)
-	TIMER0_TAILR_R = 39999;
+	TIMER0_TAILR_R = 39999;			//39999 is 2 khz
   TIMER0_IMR_R |= TIMER_IMR_TATOIM;// enable timeout (rollover) interrupt
   TIMER0_ICR_R = TIMER_ICR_TATOCINT;// clear timer0A timeout flag
   TIMER0_CTL_R |= TIMER_CTL_TAEN;  // enable timer0A 32-b, periodic, interrupts
@@ -61,7 +61,7 @@ void Timer0A_Handler(void) {
 int main(void) {
 	LaunchPad_Init();
 	PLL_Init(Bus80MHz);
-	ADC0_InitSWTriggerSeq3_Ch9();
+	//ADC0_InitSWTriggerSeq3_Ch9();
 	ADC_Init89();
 	Timer0A_Init1KHzInt();
 	UART_Init();
@@ -75,12 +75,12 @@ int main(void) {
 	
 	EnableInterrupts();
 	
-	message_t dataArr[512];
+	message_t dataArr[128];
 	uint16_t dataArrIndex = 0;
 	while (1) {
 		// if there's data, transmit it
 		//numSamples = UART_InUDec();
-		numSamples = 512;
+		numSamples = 128;
 		while(dataArrIndex < numSamples){
 			// wait for array to fill up
 			if(ADCMailbox == 1){
@@ -93,12 +93,15 @@ int main(void) {
 				ADCMailbox = 0;
 			}
 		}
+		dataArrIndex = 0;
 		//if (ADCMailbox == 1) {
 			PF2 = 0x04;
 			// send to pc with printf
 			char message_out[50];
 			DisableInterrupts();
+			UART_OutChar('\n');
 			UART_OutChar('s');
+			UART_OutChar('\n');
 			for(int i = 0; i < numSamples; i++){
 				
 				sprintf(message_out, "%d %d %d\n", dataArr[i].id, dataArr[i].ch_1, dataArr[i].ch_2);
