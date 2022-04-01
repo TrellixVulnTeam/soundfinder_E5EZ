@@ -5,17 +5,21 @@ import scipy.fftpack
 
 from receiver import Receiver
 
-r = Receiver("random_data", use_file=True)
+source = "sample_gen_example1.txt"
+fs = 8              # kHz
+frame_size = 128    # samples
 
-data = r.receive(4096)
+r = Receiver(source, use_file=True)
 
-N = 4096
+data = r.receive(frame_size)
 
-T = 1/2000 # fake sampling rate of 2000 Hz
+N = frame_size
+
+T = 1/(fs * 1000) # fake sampling rate of 2000 Hz or 8000 Hz
 
 x = np.linspace(0, N*T, N)
-# y = data[:,1]
-y = np.sin(2*np.pi*440*x)
+y = data[:,2]
+# y = np.sin(2*np.pi*440*x)
 
 yf = scipy.fftpack.fft(y)
 xf= np.linspace(0, 1//(2*T), N//2)
