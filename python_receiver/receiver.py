@@ -46,7 +46,8 @@ class Receiver:
 
         # print("pog")
 
-        self.serial_port.flushInput()
+        if not self.use_file:
+            self.serial_port.flushInput()
 
 
         # Wait for the start character

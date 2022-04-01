@@ -14,8 +14,8 @@ N = 128
 T = 1/2000 # fake sampling rate of 2000 Hz
 
 x = np.linspace(0, N*T, N)
-# y = data[:,1]
-y = np.sin(2*np.pi*440*x)
+y = data[:,2]
+# y = np.sin(2*np.pi*440*x)
 
 yf = scipy.fftpack.fft(y)
 xf= np.linspace(0, 1//(2*T), N//2)
