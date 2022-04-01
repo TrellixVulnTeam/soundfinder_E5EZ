@@ -27,7 +27,7 @@ class Receiver:
         self.baud_rate = baud_rate
 
         if self.use_file is True:
-            self.serial_port = open(self.source, "r")
+            self.serial_port = open(self.source, "rb")
         else:
             self.serial_port = serial.Serial(self.source, self.baud_rate, timeout=1, write_timeout=1)
     
