@@ -6,7 +6,7 @@ output_name = 'example1'
 # simulated mic settings
 mic_delay_a = 0      # ms
 mic_delay_b = 0.0006 # ms
-mic_noise_a = 10     # %
+mic_noise_a = 15     # %
 mic_noise_b = 30     # %
 # simulated freq settings
 sin_freq = 440          # Hz or cycles/sec
@@ -43,6 +43,7 @@ y_b = ((adc_resolution - adc_amp_cutoff) * (y_b - np.min(y_b)) / (np.max(y_b) - 
 # save output
 line_count = 0
 with open('sample_gen_{}.txt'.format(output_name), 'w') as output_file:
+    output_file.write('s\n')
     for ti in t:
         output_file.write('{} {} {}\n'.format(ti, y_a[ti], y_b[ti]))
         line_count += 1
