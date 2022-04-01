@@ -27,7 +27,7 @@ class Receiver:
         self.baud_rate = baud_rate
 
         if self.use_file is True:
-            self.serial_port = open(self.source, "rb")
+            self.serial_port = open(self.source, "r")
         else:
             self.serial_port = serial.Serial(self.source, self.baud_rate, timeout=1, write_timeout=1)
     
@@ -46,7 +46,7 @@ class Receiver:
 
         # print("pog")
 
-        self.serial_port.flushInput()
+        # self.serial_port.flushInput()
 
 
         # Wait for the start character
@@ -82,7 +82,8 @@ if __name__ == "__main__":
 
     # print(data)
 
-    r = Receiver("COM27")
+    # r = Receiver("COM27")
+    r = Receiver("run1", use_file=True)
 
     data = r.receive(128)
 
@@ -106,4 +107,4 @@ if __name__ == "__main__":
     plt.plot(xf, 2/N * np.abs(yf[:N//2]))
     plt.show()
 
-    # np.savetxt("run1", data, delimiter=" ")
+    # np.savetxt("run1", data, delimiter=" ", fmt="%u")
