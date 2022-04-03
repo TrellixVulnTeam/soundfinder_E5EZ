@@ -12,6 +12,14 @@ speed_sound = 343       # 343 m/sec = speed of sound in air
 mic_distance = 12        # mm
 frame_length = frame_size / (sampling_rate * 1000)  # ms
 
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    return signal.butter(order, [lowcut, highcut], fs=fs, btype='band')
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = signal.lfilter(b, a, data)
+    return y
+
 r = Receiver(source, use_file=True)
 data = r.receive(frame_size)
 
@@ -20,6 +28,13 @@ T = 1/(sampling_rate * 1000)
 x = np.linspace(0, N*T, N)
 y_a = data[:,1]
 y_b = data[:,2]
+
+# filtering
+fs = sampling_rate * 1000
+lowcut = 500.0
+highcut = 1000.0
+y_a = butter_bandpass_filter(y_a, lowcut, highcut, fs, order=6)
+y_b = butter_bandpass_filter(y_b, lowcut, highcut, fs, order=6)
 
 yc = signal.correlate(y_a - np.mean(y_a), y_b - np.mean(y_b), mode='full')
 lag_sample_delay = yc.argmax() - (len(y_a) - 1)

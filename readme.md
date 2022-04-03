@@ -6,4 +6,5 @@ Tasks located in Projects tab - https://github.com/BrandonZupan/where-is-sound/p
 
 -   Frequency
     -   2 kHz: 39999
+    -   8 kHz: 9999
     -   48 kHz: 1665
