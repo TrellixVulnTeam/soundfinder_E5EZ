@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import signal
 
 from receiver import Receiver
 
@@ -20,7 +21,7 @@ x = np.linspace(0, N*T, N)
 y_a = data[:,1]
 y_b = data[:,2]
 
-yc = np.correlate(y_a - np.mean(y_a), y_b - np.mean(y_b), mode='full')
+yc = signal.correlate(y_a - np.mean(y_a), y_b - np.mean(y_b), mode='full')
 lag_sample_delay = yc.argmax() - (len(y_a) - 1)
 lag_time_delay = abs(lag_sample_delay) * frame_length / frame_size
 xc = np.linspace((-1 * (len(yc) / 2) - 1), (len(yc) / 2) - 1, len(yc))  # in samples
