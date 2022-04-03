@@ -42,7 +42,7 @@ class Receiver:
             raise ValueError(f'Cannot receive more than {self.MAX_SAMPLES}')
 
         i = 0
-        data = np.zeros((num_samples, 3), dtype=np.uint)
+        data = np.zeros((num_samples, 2), dtype=np.uint)
 
         # print("pog")
 

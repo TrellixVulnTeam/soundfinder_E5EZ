@@ -80,7 +80,7 @@ int main(void) {
 	while (1) {
 		// if there's data, transmit it
 		//numSamples = UART_InUDec();
-		numSamples = 128;
+		numSamples = 192;
 		while(dataArrIndex < numSamples){
 			// wait for array to fill up
 			if(ADCMailbox == 1){
