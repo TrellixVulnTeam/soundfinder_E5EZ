@@ -13,7 +13,7 @@ class Receiver:
 
     serial_port = None
 
-    MAX_SAMPLES = 128
+    MAX_SAMPLES = 192
 
 
 
@@ -86,18 +86,18 @@ if __name__ == "__main__":
     # r = Receiver("COM27")
     r = Receiver("run1", use_file=True)
 
-    data = r.receive(128)
+    data = r.receive(192)
 
     # plt.plot(data[:,1], "b")
     # plt.plot(data[:,2], "r")
     # plt.show()
 
-    N = 128
+    N = 192
 
     T = 1/2000 # fake sampling rate of 2000 Hz
 
     x = np.linspace(0, N*T, N)
-    y = data[:,2]
+    y = data[:,1]
     # y = np.sin(2*np.pi*440*x)
 
     yf = scipy.fftpack.fft(y)
