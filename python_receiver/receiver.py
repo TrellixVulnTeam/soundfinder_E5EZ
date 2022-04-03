@@ -1,6 +1,7 @@
 import serial
 import numpy as np
 import scipy.fftpack
+from scipy import signal
 import matplotlib.pyplot as plt
 
 class Receiver:
@@ -76,36 +77,57 @@ class Receiver:
         return data
 
 
+    def filter(self, data):
+        b, a = signal.iirfilter(17, [2*np.pi*50, 2*np.pi*200], rp=1, rs=60, btype='band', ftype='ellip', fs=2*np.pi*8000)
+        w, h = signal.freqs(b, a, 1000)
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        ax.semilogx(w / (2*np.pi), 20 * np.log10(np.maximum(abs(h), 1e-5)))
+        ax.set_title('Chebyshev Type II bandpass frequency response')
+        ax.set_xlabel('Frequency [Hz]')
+        ax.set_ylabel('Amplitude [dB]')
+        ax.axis((10, 1000, -100, 10))
+        ax.grid(which='both', axis='both')
+        plt.show()
+
+
 if __name__ == "__main__":
-    # r = Receiver("test_data", use_file=True)
 
-    # data = r.receive(10)
-
-    # print(data)
-
-    # r = Receiver("COM27")
     r = Receiver("run1", use_file=True)
+    r.filter(None)
 
-    data = r.receive(128)
 
-    # plt.plot(data[:,1], "b")
-    # plt.plot(data[:,2], "r")
+
+    #
+    # # r = Receiver("test_data", use_file=True)
+    #
+    # # data = r.receive(10)
+    #
+    # # print(data)
+    #
+    # # r = Receiver("COM27")
+    # r = Receiver("run1", use_file=True)
+    #
+    # data = r.receive(128)
+    #
+    # # plt.plot(data[:,1], "b")
+    # # plt.plot(data[:,2], "r")
+    # # plt.show()
+    #
+    # N = 128
+    #
+    # T = 1/2000 # fake sampling rate of 2000 Hz
+    #
+    # x = np.linspace(0, N*T, N)
+    # y = data[:,2]
+    # # y = np.sin(2*np.pi*440*x)
+    #
+    # yf = scipy.fftpack.fft(y)
+    # xf= np.linspace(0, 1//(2*T), N//2)
+    #
+    # plt.ylabel("Amplitude")
+    # plt.xlabel("Frequency [Hz]")
+    # plt.plot(xf, 2/N * np.abs(yf[:N//2]))
     # plt.show()
-
-    N = 128
-
-    T = 1/2000 # fake sampling rate of 2000 Hz
-
-    x = np.linspace(0, N*T, N)
-    y = data[:,2]
-    # y = np.sin(2*np.pi*440*x)
-
-    yf = scipy.fftpack.fft(y)
-    xf= np.linspace(0, 1//(2*T), N//2)
-
-    plt.ylabel("Amplitude")
-    plt.xlabel("Frequency [Hz]")
-    plt.plot(xf, 2/N * np.abs(yf[:N//2]))
-    plt.show()
-
-    # np.savetxt("run1", data, delimiter=" ", fmt="%u")
+    #
+    # # np.savetxt("run1", data, delimiter=" ", fmt="%u")
