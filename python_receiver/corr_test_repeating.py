@@ -5,11 +5,11 @@ from scipy import signal
 
 from receiver import Receiver
 
-source = "COM27"
+source = "COM4"
 sampling_rate = 8       # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
-frame_size = 128        # #samples
+frame_size = 192        # #samples
 speed_sound = 343       # 343 m/sec = speed of sound in air
-mic_distance = 12        # mm
+mic_distance = 100      # mm
 frame_length = frame_size / (sampling_rate * 1000)  # ms
 
 r = Receiver(source, use_file=False)
@@ -20,8 +20,8 @@ while True:
     N = frame_size
     T = 1/(sampling_rate * 1000)
     x = np.linspace(0, N*T, N)
-    y_a = data[:,1]
-    y_b = data[:,2]
+    y_a = data[:,0]
+    y_b = data[:,1]
 
     yc = signal.correlate(y_a - np.mean(y_a), y_b - np.mean(y_b), mode='full')
     lag_sample_delay = yc.argmax() - (len(y_a) - 1)

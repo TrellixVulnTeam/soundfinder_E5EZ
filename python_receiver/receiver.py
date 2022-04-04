@@ -101,7 +101,7 @@ if __name__ == "__main__":
     r = Receiver("COM27")
     data = r.receive(192)
 
-    data = r.filter(data)
+    data = r.receive(192)
 
     # plt.plot(data[:,1], "b")
     # plt.plot(data[:,2], "r")

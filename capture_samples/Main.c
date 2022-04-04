@@ -15,7 +15,7 @@ uint32_t ADCvalue[2];
 uint32_t count;
 
 typedef struct Message {
-	uint16_t id;
+	//uint16_t id;
 	uint16_t ch_1;
 	uint16_t ch_2;
 } message_t;
@@ -35,7 +35,7 @@ void Timer0A_Init1KHzInt(void) {
                                    // configure for periodic mode
   TIMER0_TAMR_R = TIMER_TAMR_TAMR_PERIOD;
   // TIMER0_TAILR_R = 79999;         // start value for 1 KHz interrupts (was 79999)
-	TIMER0_TAILR_R = 39999;			//39999 is 2 khz
+	TIMER0_TAILR_R = 9999;			//39999 is 2 khz	9999 is 8 KHz0
   TIMER0_IMR_R |= TIMER_IMR_TATOIM;// enable timeout (rollover) interrupt
   TIMER0_ICR_R = TIMER_ICR_TATOCINT;// clear timer0A timeout flag
   TIMER0_CTL_R |= TIMER_CTL_TAEN;  // enable timer0A 32-b, periodic, interrupts
@@ -75,17 +75,17 @@ int main(void) {
 	
 	EnableInterrupts();
 	
-	message_t dataArr[128];
+	message_t dataArr[192];
 	uint16_t dataArrIndex = 0;
 	while (1) {
 		// if there's data, transmit it
 		//numSamples = UART_InUDec();
-		numSamples = 128;
+		numSamples = 192;
 		while(dataArrIndex < numSamples){
 			// wait for array to fill up
 			if(ADCMailbox == 1){
 				PF2 = 0x04;
-				dataArr[dataArrIndex].id = count;
+				//dataArr[dataArrIndex].id = count;
 			
 				dataArr[dataArrIndex].ch_1 = ADCvalue[0];
 				dataArr[dataArrIndex].ch_2 = ADCvalue[1];
@@ -104,7 +104,7 @@ int main(void) {
 			UART_OutChar('\n');
 			for(int i = 0; i < numSamples; i++){
 				
-				sprintf(message_out, "%d %d %d\n", dataArr[i].id, dataArr[i].ch_1, dataArr[i].ch_2);
+				sprintf(message_out, "%d %d\n", dataArr[i].ch_1, dataArr[i].ch_2);
 			
 			// printf("%d %d %d \n", count, ADCvalue[0], ADCvalue[1]);
 			
