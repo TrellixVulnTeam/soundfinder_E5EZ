@@ -14,7 +14,7 @@ class Receiver:
 
     serial_port = None
 
-    MAX_SAMPLES = 128
+    MAX_SAMPLES = 192
 
 
 
@@ -43,7 +43,7 @@ class Receiver:
             raise ValueError(f'Cannot receive more than {self.MAX_SAMPLES}')
 
         i = 0
-        data = np.zeros((num_samples, 3), dtype=np.uint)
+        data = np.zeros((num_samples, 2), dtype=np.uint)
 
         # print("pog")
 
@@ -78,23 +78,50 @@ class Receiver:
 
 
     def filter(self, data):
-        b, a = signal.iirfilter(17, [2*np.pi*50, 2*np.pi*200], rp=1, rs=60, btype='band', ftype='ellip', fs=2*np.pi*8000)
-        w, h = signal.freqs(b, a, 1000)
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        ax.semilogx(w / (2*np.pi), 20 * np.log10(np.maximum(abs(h), 1e-5)))
-        ax.set_title('Chebyshev Type II bandpass frequency response')
-        ax.set_xlabel('Frequency [Hz]')
-        ax.set_ylabel('Amplitude [dB]')
-        ax.axis((10, 1000, -100, 10))
-        ax.grid(which='both', axis='both')
-        plt.show()
+        b = [0.001134,-0.014390,0.087372,-0.335444,0.905163,-1.799220,2.665252,-2.851675,1.884637,-0.000000,-1.884637,2.851675,-2.665252,1.799220,-0.905163,0.335444,-0.087372,0.014390,-0.001134]
+        a = [1.000000,-14.688676,104.433693,-476.896409,1565.851943,-3922.706308,7765.854993,-12417.589951,16253.031782,-17540.539935,15644.740702,-11505.422199,6925.971668,-3367.416178,1293.821638,-379.276046,79.942807,-10.822757,0.709247]
+        # # b, a = signal.iirfilter(17, [2*np.pi*50, 2*np.pi*200], rp=1, rs=60, btype='band', ftype='ellip', fs=2*np.pi*8000)
+        # w, h = signal.freqs(b, a, 8000)
+        # fig = plt.figure()
+        # ax = fig.add_subplot(1, 1, 1)
+        # ax.semilogx(w / (2*np.pi), 20 * np.log10(np.maximum(abs(h), 1e-5)))
+        # ax.set_title('Chebyshev Type II bandpass frequency response')
+        # ax.set_xlabel('Frequency [Hz]')
+        # ax.set_ylabel('Amplitude [dB]')
+        # ax.axis((10, 1000, -100, 10))
+        # ax.grid(which='both', axis='both')
+        # plt.show()
+
+        # do filtering
+        return signal.lfilter(b, a, data)
 
 
 if __name__ == "__main__":
 
-    r = Receiver("run1", use_file=True)
-    r.filter(None)
+    r = Receiver("COM27")
+    data = r.receive(192)
+
+    data = r.filter(data)
+
+    # plt.plot(data[:,1], "b")
+    # plt.plot(data[:,2], "r")
+    # plt.show()
+
+    N = 192
+
+    T = 1/8000 # fake sampling rate of 2000 Hz
+
+    x = np.linspace(0, N*T, N)
+    y = data[:,1]
+    # y = np.sin(2*np.pi*440*x)
+
+    yf = scipy.fftpack.fft(y)
+    xf= np.linspace(0, 1//(2*T), N//2)
+
+    plt.ylabel("Amplitude")
+    plt.xlabel("Frequency [Hz]")
+    plt.plot(xf, 2/N * np.abs(yf[:N//2]))
+    plt.show()
 
 
 
@@ -108,13 +135,13 @@ if __name__ == "__main__":
     # # r = Receiver("COM27")
     # r = Receiver("run1", use_file=True)
     #
-    # data = r.receive(128)
+    # data = r.receive(192)
     #
     # # plt.plot(data[:,1], "b")
     # # plt.plot(data[:,2], "r")
     # # plt.show()
     #
-    # N = 128
+    # N = 192
     #
     # T = 1/2000 # fake sampling rate of 2000 Hz
     #
