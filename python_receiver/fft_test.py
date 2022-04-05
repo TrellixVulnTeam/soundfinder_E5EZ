@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from receiver import Receiver
 
 source = "sample_gen_example1.txt"
-sampling_rate = 8       # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
+sampling_rate = 48      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
 frame_size = 192        # #samples
 frame_length = frame_size / (sampling_rate * 1000)  # ms
 
