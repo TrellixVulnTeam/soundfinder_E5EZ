@@ -35,7 +35,8 @@ void Timer0A_Init1KHzInt(void) {
                                    // configure for periodic mode
   TIMER0_TAMR_R = TIMER_TAMR_TAMR_PERIOD;
   // TIMER0_TAILR_R = 79999;         // start value for 1 KHz interrupts (was 79999)
-	TIMER0_TAILR_R = 9999;			//39999 is 2 khz	9999 is 8 KHz0
+	TIMER0_TAILR_R = 1665;			//39999 is 2 khz	9999 is 8 KHz0  2499 is 32 KHz
+	// 1665 = 48 KHz
   TIMER0_IMR_R |= TIMER_IMR_TATOIM;// enable timeout (rollover) interrupt
   TIMER0_ICR_R = TIMER_ICR_TATOCINT;// clear timer0A timeout flag
   TIMER0_CTL_R |= TIMER_CTL_TAEN;  // enable timer0A 32-b, periodic, interrupts
