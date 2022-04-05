@@ -6,7 +6,7 @@ from scipy import signal
 from receiver import Receiver
 
 source = "COM27"
-sampling_rate = 8       # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
+sampling_rate = 48      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
 frame_size = 192        # #samples
 speed_sound = 343       # 343 m/sec = speed of sound in air
 mic_distance = 250      # mm
