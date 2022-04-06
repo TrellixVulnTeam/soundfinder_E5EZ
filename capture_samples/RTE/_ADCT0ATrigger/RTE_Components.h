@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'ADCT0ATrigger' 
+ * Project: 'WhereIsTheSound_sample_capture' 
  * Target:  'ADCT0ATrigger' 
  */
 

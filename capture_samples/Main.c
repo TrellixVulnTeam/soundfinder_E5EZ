@@ -1,3 +1,6 @@
+/* WhereIsTheSound_sample_capture
+	EE464 FH16 - Where Is The Sound
+*/
 
 #include <stdio.h>
 #include <stdint.h>
@@ -6,23 +9,38 @@
 #include "../inc/PLL.h"
 #include "../inc/LaunchPad.h"
 #include "../inc/CortexM.h"
-#include "../inc/TExaS.h"
 
+/* debugging profile */
+#define DEBUG_ON
+//#undef DEBUG_ON  // comment this line out to enable debugging with TExaSdisplay
+#ifndef DEBUG_ON
 #include "../inc/uart.h"
+#else
+#include "../inc/TExaS.h"
+// logic analyzer - records digital signals ie. PWM on PF0-6
+void LogicAnalyzerTask(void){
+  UART0_DR_R = 0x80|GPIO_PORTF_DATA_R; // sends at 10kHz to TExaSdisplay
+}
+// scope - measures analog voltage on PD3
+void ScopeTask(void){  // called 10k/sec
+  UART0_DR_R = (ADC1_SSFIFO3_R>>4); // send ADC to TExaSdisplay
+}
+#endif
 
+/* sample frame data structure */
+typedef struct Message {
+	//uint16_t id;  // removed to increase frame size
+	uint16_t ch_1;  // sample value from mic A
+	uint16_t ch_2;  // sample value from mic B
+} message_t;
+// frame size (in samples)
+uint16_t numSamples; // TODO: set by python code via UART
+
+/* ADC */
 uint8_t ADCMailbox;
 uint32_t ADCvalue[2];
 uint32_t count;
-
-typedef struct Message {
-	//uint16_t id;
-	uint16_t ch_1;
-	uint16_t ch_2;
-} message_t;
-
-// set by python code via UART
-uint16_t numSamples;
-
+// sampling timer
 void Timer0A_Init1KHzInt(void) {
   volatile uint32_t delay;
   DisableInterrupts();
@@ -45,7 +63,7 @@ void Timer0A_Init1KHzInt(void) {
   NVIC_PRI4_R = (NVIC_PRI4_R&0x00FFFFFF)|0x40000000; // top 3 bits
   NVIC_EN0_R = 1<<19;              // enable interrupt 19 in NVIC
 }
-
+// ISR for sampling
 void Timer0A_Handler(void) {
 	PF1 = 0x02;
 	TIMER0_ICR_R = TIMER_ICR_TATOCINT;
@@ -56,26 +74,36 @@ void Timer0A_Handler(void) {
 }
 
 
-
-
-
+/* entry point */
 int main(void) {
-	LaunchPad_Init();
+	// debugging profile
+#ifndef DEBUG_ON
 	PLL_Init(Bus80MHz);
-	//ADC0_InitSWTriggerSeq3_Ch9();
-	ADC_Init89();
-	Timer0A_Init1KHzInt();
-	UART_Init();
-	
+	LaunchPad_Init();
+	//ADC0_InitSWTriggerSeq3_Ch9();  // 1 channel (PE4)
+	ADC_Init89(); 	// 2 channels (PE4,PE5)
+	Timer0A_Init1KHzInt();  // hardware timer
+	UART_Init();  // serial
+#else
+	// pick one of the following three lines, all three set PLL to 80 MHz
+  //PLL_Init(Bus80MHz);                 // 1) call to have no TExaS debugging
+  //TExaS_SetTask(&LogicAnalyzerTask);  // 2) call to activate logic analyzer on PF0-6
+  TExaS_SetTask(&ScopeTask);            // 3) call to activate analog scope PD3
+	LaunchPad_Init();  // required
+#endif
 	PF1 = 0;
 	PF2 = 0;
 	PF3 = 0;
 	
+	// adc
 	count = 0;
 	ADCMailbox = 0;
-	
+
+	// start sampling timer
 	EnableInterrupts();
 	
+#ifndef DEBUG_ON
+	// stream mic samples to python over serial
 	message_t dataArr[192];
 	uint16_t dataArrIndex = 0;
 	while (1) {
@@ -96,7 +124,7 @@ int main(void) {
 		}
 		dataArrIndex = 0;
 		//if (ADCMailbox == 1) {
-			PF2 = 0x04;
+			PF2 = 0x04; // profile
 			// send to pc with printf
 			char message_out[50];
 			DisableInterrupts();
@@ -123,10 +151,15 @@ int main(void) {
 //			UART_OutUDec(ADCvalue[1]);
 //			UART_OutChar('\n');
 			
-			PF2 = 0x00;
+			PF2 = 0x00; // profile
 			
 			//ADCMailbox = 0;
 			
 		//}
 	}
+#else
+	while (1) {
+		PF1 ^= 0x02;
+	}
+#endif
 }
