@@ -42,7 +42,7 @@ y_b = ((adc_resolution - adc_amp_cutoff) * (y_b - np.min(y_b)) / (np.max(y_b) - 
 
 # save output
 line_count = 0
-with open('sample_gen_{}.txt'.format(output_name), 'w') as output_file:
+with open('sample_gen_{}_{}kHz_{}Hz_{}ms.txt'.format(output_name, sampling_rate, sin_freq, round(mic_delay_b - mic_delay_a,3)).format(output_name), 'w') as output_file:
     output_file.write('s\n')
     for ti in t:
         output_file.write('{} {} {}\n'.format(ti, y_a[ti], y_b[ti]))
@@ -56,4 +56,6 @@ plt.xlabel('sample # (t)')
 plt.ylabel('delay(sin(x) + noise)')
 plt.axis('tight')
 plt.legend()
+
+plt.savefig('sample_gen_{}_{}kHz_{}Hz_{}ms.png'.format(output_name, sampling_rate, sin_freq, round(mic_delay_b - mic_delay_a,3)))
 plt.show()
