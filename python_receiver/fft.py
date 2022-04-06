@@ -6,14 +6,16 @@ import matplotlib.pyplot as plt
 
 from receiver import Receiver
 
+
 class FFT:
     frame_size = 0
     sampling_rate = 0
-    period = 1/(sampling_rate)
+    period = 0
 
-    def __init__(self, frame_size=128, sampling_rate=8000):
+    def __init__(self, frame_size=192, sampling_rate=8000):
         self.frame_size = frame_size
         self.sampling_rate = sampling_rate
+        self.period = 1/self.sampling_rate
 
     def fft(self, ch1_data, ch2_data):
         """
@@ -37,3 +39,33 @@ class FFT:
         plt.xlabel("Frequency [Hz]")
         plt.plot(xf, 2/self.frame_size * np.abs(yf1[:self.frame_size//2]), 'b')
         plt.plot(xf, 2 / self.frame_size * np.abs(yf2[:self.frame_size // 2]), 'r')
+        plt.show()
+
+
+if __name__ == "__main__":
+    # fft = FFT(sampling_rate=32000)
+    fft = FFT()
+    # receiver = Receiver("COM27")
+    receiver = Receiver("sin-unfiltered", use_file=True)
+
+    data = receiver.receive(192)
+
+    # filter
+    ch1 = receiver.filter(data[:,0])
+    ch2 = receiver.filter(data[:,1])
+
+    t = np.linspace(0, 1/8000, 192)
+    plt.plot(t, data[:,0], 'b')
+    plt.plot(t, data[:,1], 'r')
+    plt.show()
+
+
+
+    xf, yf1, yf2 = fft.fft(data[:,0], data[:,1])
+    xf_filter, yf1_filter, yf2_filter = fft.fft(ch1, ch2)
+
+    fft.graph_fft_data(xf, yf1, yf2)
+
+    fft.graph_fft_data(xf_filter, yf1_filter, yf2_filter)
+
+    # np.savetxt("pog", data, delimiter=" ", fmt="%u")

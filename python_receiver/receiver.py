@@ -113,11 +113,13 @@ class Receiver:
         SOS[3] = [1.0000, -2.0025, 1.0064, 1.0000, -1.9843, 0.9913]
         SOS[4] = [1.0000, -1.9927, 0.9972, 1.0000, -1.9917, 0.9979]
 
-        sos = signal.ellip(13, 1, 80, )
+        G = [0.778730,1.000000,1.000000,1.000000,1.000000,1.000000]
+
+        # SOS = signal.ellip(13, 1, 80, 0.1, output='sos', fs=8)
 
         # print(SOS)
 
-        return signal.sosfilt(SOS, data)
+        return np.prod(G)*signal.sosfilt(SOS, data)
 
 
 if __name__ == "__main__":
