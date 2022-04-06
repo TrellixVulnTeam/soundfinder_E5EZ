@@ -13,10 +13,10 @@ sample_delay = np.linspace(0, 90, 91)
 time_delay = np.linspace(0, 90, 91)
 
 for t in range(len(theta)):
-    # time_delay[t] = math.cos((math.pi / 180.0) * theta[t]) * (mic_distance / 1000) / speed_sound
-    # sample_delay[t] = (sampling_rate * 1000) * time_delay[t]
-    time_delay[t] = 0.1 * theta[t] / (57.29578*0.000001*343)
-    sample_delay[t] = time_delay[t]
+    time_delay[t] = math.cos((math.pi / 180.0) * theta[t]) * (mic_distance / 1000) / speed_sound
+    sample_delay[t] = (sampling_rate * 1000) * time_delay[t]
+    # time_delay[t] = 0.1 * theta[t] / (57.29578*0.000001*343)
+    # sample_delay[t] = time_delay[t]
 
 fig, ax1 = plt.subplots()
 ax1.set_xlabel("Theta")
