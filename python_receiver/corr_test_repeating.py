@@ -6,7 +6,7 @@ from scipy import signal
 from receiver import Receiver
 
 source = "COM4"
-sampling_rate = 48      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
+sampling_rate = 24      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
 frame_size = 192        # #samples
 speed_sound = 343       # 343 m/sec = speed of sound in air
 mic_distance = 260      # mm
@@ -30,7 +30,7 @@ while True:
     xc = xc * frame_length / frame_size    # in ms
 
     incident_mic = 'both' if lag_sample_delay == 0 else ('mic_A' if lag_sample_delay < 0 else 'mic_B')
-    incident_angle = (180.0 / math.pi) * math.acos(speed_sound * (lag_time_delay / 1000) / (mic_distance / 1000))
+    incident_angle = (180.0 / math.pi) * math.acos(speed_sound * (lag_time_delay) / (mic_distance / 1000))
 
     print("Sample Delay/Lag: {} samples".format(lag_sample_delay))
     print("Time Delay/Lag: {} ms".format(lag_time_delay))

@@ -16,7 +16,7 @@ class Receiver:
 
     eng = None
 
-    MAX_SAMPLES = 192
+    MAX_SAMPLES = 216
 
 
 
