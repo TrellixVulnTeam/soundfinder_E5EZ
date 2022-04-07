@@ -1,40 +1,40 @@
 Dependencies for Project 'WhereIsTheSound_sample_capture', Target 'ADCT0ATrigger': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
-F (.\startup.s)(0x624DE915)(--cpu Cortex-M4 --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_ADCT0ATrigger-IC:\Users\anuvc\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\anuvc\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123--pd "__UVISION_VERSION SETA 535" --pd "_RTE_ SETA 1" --pd "TM4C123GH6PM SETA 1" --pd "_RTE_ SETA 1"--list .\startup.lst --xref -o .\startup.o --depend .\startup.d)
-F (..\inc\PLL.c)(0x5E1B4E3E)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\anuvc\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\anuvc\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\pll.o --omf_browse .\pll.crf --depend .\pll.d)
-I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025F66E)
-I (..\inc\../inc/PLL.h)(0x5E10DEB6)
-I (..\inc\../inc/tm4c123gh6pm.h)(0x5388D0EA)
-F (..\inc\ADCT0ATrigger.c)(0x5E1B4E3E)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\anuvc\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\anuvc\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\adct0atrigger.o --omf_browse .\adct0atrigger.crf --depend .\adct0atrigger.d)
-I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025F66E)
-I (..\inc\../inc/CortexM.h)(0x5E10DE2A)
-I (..\inc\../inc/tm4c123gh6pm.h)(0x5388D0EA)
-F (..\inc\LaunchPad.c)(0x5E1B4E3E)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\anuvc\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\anuvc\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\launchpad.o --omf_browse .\launchpad.crf --depend .\launchpad.d)
-I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025F66E)
-I (..\inc\../inc/LaunchPad.h)(0x5E10DEB6)
-I (..\inc\../inc/tm4c123gh6pm.h)(0x5388D0EA)
-I (..\inc\../inc/CortexM.h)(0x5E10DE2A)
-F (.\Main.c)(0x624DF8EF)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\anuvc\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\anuvc\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\main.o --omf_browse .\main.crf --depend .\main.d)
-I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x6025F664)
-I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025F66E)
-I (../inc/ADCSWTrigger.h)(0x5E1FDB96)
-I (../inc/tm4c123gh6pm.h)(0x5388D0EA)
-I (../inc/PLL.h)(0x5E10DEB6)
-I (../inc/LaunchPad.h)(0x5E10DEB6)
-I (../inc/CortexM.h)(0x5E10DE2A)
-I (../inc/TExaS.h)(0x615C01C4)
-F (..\inc\ADCSWTrigger.c)(0x615C00D4)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\anuvc\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\anuvc\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\adcswtrigger.o --omf_browse .\adcswtrigger.crf --depend .\adcswtrigger.d)
-I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025F66E)
-I (..\inc\../inc/tm4c123gh6pm.h)(0x5388D0EA)
-F (..\inc\UART.c)(0x5E0F84FC)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\anuvc\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\anuvc\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\uart.o --omf_browse .\uart.crf --depend .\uart.d)
-I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025F66E)
-I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x6025F664)
-I (..\inc\../inc/UART.h)(0x5E0F8722)
-I (..\inc\../inc/tm4c123gh6pm.h)(0x5388D0EA)
-F (..\inc\Texas.c)(0x615C017A)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\anuvc\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\anuvc\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\texas.o --omf_browse .\texas.crf --depend .\texas.d)
-I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025F66E)
-I (..\inc\../inc/CortexM.h)(0x5E10DE2A)
-I (..\inc\../inc/tm4c123gh6pm.h)(0x5388D0EA)
-I (..\inc\../inc/TExaS.h)(0x615C01C4)
-I (..\inc\../inc/PLL.h)(0x5E10DEB6)
-F (..\inc\Texas.h)(0x615C01C4)()
+F (.\startup.s)(0x624F35FA)(--cpu Cortex-M4 -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_ADCT0ATrigger-IC:\Users\evely\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\evely\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123--pd "__UVISION_VERSION SETA 535" --pd "_RTE_ SETA 1" --pd "TM4C123GH6PM SETA 1" --pd "_RTE_ SETA 1"--list .\startup.lst --xref -o .\startup.o --depend .\startup.d)
+F (..\inc\PLL.c)(0x613040ED)(-c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\evely\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\evely\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\pll.o --omf_browse .\pll.crf --depend .\pll.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025DA4E)
+I (..\inc\../inc/PLL.h)(0x613040ED)
+I (..\inc\../inc/tm4c123gh6pm.h)(0x615B7E97)
+F (..\inc\ADCT0ATrigger.c)(0x624639DB)(-c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\evely\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\evely\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\adct0atrigger.o --omf_browse .\adct0atrigger.crf --depend .\adct0atrigger.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025DA4E)
+I (..\inc\../inc/CortexM.h)(0x6225336C)
+I (..\inc\../inc/tm4c123gh6pm.h)(0x615B7E97)
+F (..\inc\LaunchPad.c)(0x613040ED)(-c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\evely\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\evely\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\launchpad.o --omf_browse .\launchpad.crf --depend .\launchpad.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025DA4E)
+I (..\inc\../inc/LaunchPad.h)(0x613040ED)
+I (..\inc\../inc/tm4c123gh6pm.h)(0x615B7E97)
+I (..\inc\../inc/CortexM.h)(0x6225336C)
+F (.\Main.c)(0x624F485D)(-c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\evely\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\evely\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\main.o --omf_browse .\main.crf --depend .\main.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x6025DA44)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025DA4E)
+I (../inc/ADCSWTrigger.h)(0x613040EC)
+I (../inc/tm4c123gh6pm.h)(0x615B7E97)
+I (../inc/PLL.h)(0x613040ED)
+I (../inc/LaunchPad.h)(0x613040ED)
+I (../inc/CortexM.h)(0x6225336C)
+I (../inc/uart.h)(0x613040EE)
+F (..\inc\ADCSWTrigger.c)(0x6229196A)(-c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\evely\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\evely\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\adcswtrigger.o --omf_browse .\adcswtrigger.crf --depend .\adcswtrigger.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025DA4E)
+I (..\inc\../inc/tm4c123gh6pm.h)(0x615B7E97)
+F (..\inc\UART.c)(0x624F4766)(-c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\evely\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\evely\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\uart.o --omf_browse .\uart.crf --depend .\uart.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025DA4E)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x6025DA44)
+I (..\inc\../inc/UART.h)(0x613040EE)
+I (..\inc\../inc/tm4c123gh6pm.h)(0x615B7E97)
+F (..\inc\Texas.c)(0x613A3D0F)(-c --cpu Cortex-M4 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .. -I ..\..\.. --C99-I.\RTE\_ADCT0ATrigger-IC:\Users\evely\AppData\Local\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-IC:\Users\evely\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="535" -D_RTE_ -DTM4C123GH6PM -D_RTE_ -Drvmdk -DPART_LM4F120H5QR-o .\texas.o --omf_browse .\texas.crf --depend .\texas.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025DA4E)
+I (..\inc\../inc/CortexM.h)(0x6225336C)
+I (..\inc\../inc/tm4c123gh6pm.h)(0x615B7E97)
+I (..\inc\../inc/TExaS.h)(0x613040EE)
+I (..\inc\../inc/PLL.h)(0x613040ED)
+F (..\inc\Texas.h)(0x613040EE)()

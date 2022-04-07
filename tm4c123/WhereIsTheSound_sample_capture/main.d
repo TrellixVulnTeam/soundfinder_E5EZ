@@ -6,4 +6,4 @@
 .\main.o: ../inc/PLL.h
 .\main.o: ../inc/LaunchPad.h
 .\main.o: ../inc/CortexM.h
-.\main.o: ../inc/TExaS.h
+.\main.o: ../inc/uart.h
