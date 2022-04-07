@@ -1,5 +1,5 @@
 Settings:
-sampling_rate = 16      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
+sampling_rate = 24      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
 frame_size = 192        # #samples
 speed_sound = 343       # 343 m/sec = speed of sound in air
 mic_distance = 260      # mm
@@ -11,21 +11,14 @@ Output:
 no differences over 1.0 samples
 
 5 degrees
-70-75: 1.009
-75-80: 1.033
-80-85: 1.049
-85-90: 1.057
+no differences over 1.0 samples
 
 10 degrees
-30-40: 1.213
-40-50: 1.495
-50-60: 1.732
-60-70: 1.916
-70-80: 2.042
-80-90: 2.106
+70-80: 1.021
+80-90: 1.053
 
 20 degrees
-20-40: 2.106
-40-60: 3.227
-60-80: 3.958
-80-90: 2.106
+20-40: 1.053
+40-60: 1.613
+60-80: 1.979
+80-90: 1.053

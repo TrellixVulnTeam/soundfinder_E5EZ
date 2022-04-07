@@ -5,8 +5,8 @@ from scipy import signal
 
 from receiver import Receiver
 
-source = "sample_gen_example1.txt"
-sampling_rate = 48      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
+source = "sample_gen_example1_24kHz_800Hz_0.0003ms"
+sampling_rate = 24      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
 frame_size = 192        # #samples
 speed_sound = 343       # 343 m/sec = speed of sound in air
 mic_distance = 260      # mm
@@ -26,15 +26,15 @@ data = r.receive(frame_size)
 N = frame_size
 T = 1/(sampling_rate * 1000)
 x = np.linspace(0, N*T, N)
-y_a = data[:,0]
-y_b = data[:,1]
+y_a_pre = data[:,0]
+y_b_pre = data[:,1]
 
 # filtering
 fs = sampling_rate * 1000
 lowcut = 500.0
 highcut = 1000.0
-y_a = butter_bandpass_filter(y_a, lowcut, highcut, fs, order=6)
-y_b = butter_bandpass_filter(y_b, lowcut, highcut, fs, order=6)
+y_a = butter_bandpass_filter(y_a_pre, lowcut, highcut, fs, order=6)
+y_b = butter_bandpass_filter(y_b_pre, lowcut, highcut, fs, order=6)
 
 yc = signal.correlate(y_a - np.mean(y_a), y_b - np.mean(y_b), mode='full')
 lag_sample_delay = yc.argmax() - (len(y_a) - 1)
@@ -57,3 +57,8 @@ plt.plot(xc, yc, marker='o')
 plt.annotate('argmax={}@{}ms'.format(round(yc[lag_sample_delay], 3), lag_time_delay),  (lag_time_delay, yc[yc.argmax()]), ha='center')
 plt.show()
 
+plt.ylabel("Amplitude")
+plt.xlabel("Sample")
+plt.plot(x, y_a_pre, marker='o', color='red')
+plt.plot(x, y_b_pre, marker='o', color='blue')
+plt.show()

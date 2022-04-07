@@ -5,8 +5,8 @@ from scipy import signal
 
 from receiver import Receiver
 
-source = "sample_gen_example1.txt"
-sampling_rate = 48      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
+source = "sample_gen_example1_24kHz_800Hz_0.0003ms.txt"
+sampling_rate = 24      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
 frame_size = 192        # #samples
 speed_sound = 343       # 343 m/sec = speed of sound in air
 mic_distance = 260      # mm
