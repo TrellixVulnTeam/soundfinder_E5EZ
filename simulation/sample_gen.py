@@ -6,7 +6,7 @@ output_name = 'example1'
 # simulated mic settings
 speed_sound = 343       # 343 m/sec = speed of sound in air
 mic_distance = 260      # mm
-incident_angle = 65     # degrees
+incident_angle = 10     # degrees
 mic_delay_a = 0         # ms
 mic_delay_b =  math.cos((math.pi / 180.0) * incident_angle) * (mic_distance / 1000) / speed_sound
 # mic_delay_b = 0.0010  # ms
