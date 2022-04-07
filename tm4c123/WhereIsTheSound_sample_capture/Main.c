@@ -83,7 +83,7 @@ int main(void) {
 	//ADC0_InitSWTriggerSeq3_Ch9();  // 1 channel (PE4)
 	ADC_Init89(); 	// 2 channels (PE4,PE5)
 	//Timer0A_Init1KHzInt();  // hardware timer
-	Timer0A_InitVarKHzInt(48, 80);  // hardware timer
+	Timer0A_InitVarKHzInt(24, 80);  // hardware timer
 	UART_Init();  // serial
 #else
 	// pick one of the following three lines, all three set PLL to 80 MHz
@@ -105,7 +105,7 @@ int main(void) {
 	
 #ifndef DEBUG_ON
 	// stream mic samples to python over serial
-	message_t dataArr[192];
+	message_t dataArr[216];
 	uint16_t dataArrIndex = 0;
 	while (1) {
 		// if there's data, transmit it
@@ -127,7 +127,7 @@ int main(void) {
 		//if (ADCMailbox == 1) {
 			PF2 = 0x04; // profile
 			// send to pc with printf
-			char message_out[50];
+			char message_out[16];
 			DisableInterrupts();
 			UART_OutChar('\n');
 			UART_OutChar('s');

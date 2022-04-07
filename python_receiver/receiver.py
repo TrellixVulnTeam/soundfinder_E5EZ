@@ -16,7 +16,7 @@ class Receiver:
 
     eng = None
 
-    MAX_SAMPLES = 192
+    MAX_SAMPLES = 216
 
 
 
@@ -137,13 +137,13 @@ if __name__ == "__main__":
     # r = Receiver("COM27")
     r = Receiver("sin-unfiltered", use_file=True)
     r.start_matlab()
-    data = r.receive(192)
+    data = r.receive(216)
 
     # plt.plot(data[:,1], "b")
     # plt.plot(data[:,2], "r")
     # plt.show()
 
-    N = 192
+    N = 216
 
     T = 1/8000 # fake sampling rate of 2000 Hz
 
@@ -171,13 +171,13 @@ if __name__ == "__main__":
     # # r = Receiver("COM27")
     # r = Receiver("run1", use_file=True)
     #
-    # data = r.receive(192)
+    # data = r.receive(216)
     #
     # # plt.plot(data[:,1], "b")
     # # plt.plot(data[:,2], "r")
     # # plt.show()
     #
-    # N = 192
+    # N = 216
     #
     # T = 1/2000 # fake sampling rate of 2000 Hz
     #
