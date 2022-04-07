@@ -5,7 +5,7 @@ from scipy import signal
 
 from receiver import Receiver
 
-source = "COM4"
+source = "/dev/cu.usbmodem0E21FD801"
 sampling_rate = 24      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
 frame_size = 216        # #samples
 speed_sound = 343       # 343 m/sec = speed of sound in air
@@ -26,7 +26,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     y = signal.sosfilt(sos, data)
     return y
 
-r = Receiver(source, use_file=True)
+r = Receiver(source, use_file=False)
 
 while True:
     data = r.receive(frame_size)
