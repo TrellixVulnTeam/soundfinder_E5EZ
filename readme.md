@@ -2,9 +2,9 @@
 
 Tasks located in Projects tab - https://github.com/BrandonZupan/where-is-sound/projects
 
-## notes
+## Notes
 
--   Frequency
+-   Sampling Frequency vs TM4C Timer Period Mapping
     -   1 kHz: 79999
     -   2 kHz: 39999
     -   8 kHz: 9999
