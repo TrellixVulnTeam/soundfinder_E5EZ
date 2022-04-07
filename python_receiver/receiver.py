@@ -14,6 +14,8 @@ class Receiver:
 
     serial_port = None
 
+    eng = None
+
     MAX_SAMPLES = 192
 
 
@@ -121,12 +123,20 @@ class Receiver:
 
         return np.prod(G)*signal.sosfilt(SOS, data)
 
+    def start_matlab(self):
+        import matlab.engine
+        self.eng = matlab.engine.start_matlab()
+
+    def matlab_filter(self, samples):
+        out = self.eng.filter_1(samples)
+        return out
+
 
 if __name__ == "__main__":
 
-    r = Receiver("COM27")
-    data = r.receive(192)
-
+    # r = Receiver("COM27")
+    r = Receiver("sin-unfiltered", use_file=True)
+    r.start_matlab()
     data = r.receive(192)
 
     # plt.plot(data[:,1], "b")
