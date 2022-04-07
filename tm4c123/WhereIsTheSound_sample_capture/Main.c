@@ -12,7 +12,7 @@
 
 /* debugging profile */
 #define DEBUG_ON
-//#undef DEBUG_ON  // comment this line out to enable debugging with TExaSdisplay
+#undef DEBUG_ON  // comment this line out to enable debugging with TExaSdisplay
 #ifndef DEBUG_ON
 #include "../inc/uart.h"
 #else
@@ -39,7 +39,7 @@ uint16_t numSamples; // TODO: set by python code via UART
 /* ADC */
 uint8_t ADCMailbox;
 uint32_t ADCvalue[2];
-uint32_t ADCperiod;
+uint32_t ADCPeriod;
 uint32_t count;
 // sampling timer
 void Timer0A_InitVarKHzInt(uint16_t sampling_rate_khz, uint32_t bus_clock_mhz) {
@@ -83,7 +83,7 @@ int main(void) {
 	//ADC0_InitSWTriggerSeq3_Ch9();  // 1 channel (PE4)
 	ADC_Init89(); 	// 2 channels (PE4,PE5)
 	//Timer0A_Init1KHzInt();  // hardware timer
-	Timer0A_InitVarKHzInt(8, 80);  // hardware timer
+	Timer0A_InitVarKHzInt(48, 80);  // hardware timer
 	UART_Init();  // serial
 #else
 	// pick one of the following three lines, all three set PLL to 80 MHz

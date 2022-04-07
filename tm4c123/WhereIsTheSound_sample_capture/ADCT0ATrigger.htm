@@ -3,21 +3,21 @@
 <title>Static Call Graph - [.\ADCT0ATrigger.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\ADCT0ATrigger.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Wed Apr 06 15:32:56 2022
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu Apr 07 15:23:59 2022
 <BR><P>
-<H3>Maximum Stack Usage =         32 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        848 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-main &rArr; TExaS_SetTask &rArr; PeriodicTask2_Init
+main &rArr; __2sprintf
 <P>
 <H3>
 Functions with no stack information
 </H3><UL>
  <LI><a href="#[7e]">Reset_Handler</a>
- <LI><a href="#[94]">DisableInterrupts</a>
- <LI><a href="#[8c]">EnableInterrupts</a>
- <LI><a href="#[84]">StartCritical</a>
- <LI><a href="#[85]">EndCritical</a>
- <LI><a href="#[95]">WaitForInterrupt</a>
+ <LI><a href="#[85]">DisableInterrupts</a>
+ <LI><a href="#[8f]">EnableInterrupts</a>
+ <LI><a href="#[98]">StartCritical</a>
+ <LI><a href="#[99]">EndCritical</a>
+ <LI><a href="#[9a]">WaitForInterrupt</a>
 </UL>
 </UL>
 <P>
@@ -123,7 +123,6 @@ Function Pointers
  <LI><a href="#[43]">SSI2_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[44]">SSI3_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[6]">SVC_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
- <LI><a href="#[7d]">ScopeTask</a> from main.o(i.ScopeTask) referenced from main.o(i.main)
  <LI><a href="#[26]">SysCtl_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[9]">SysTick_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[1d]">Timer0A_Handler</a> from main.o(i.Timer0A_Handler) referenced from startup.o(RESET)
@@ -136,7 +135,7 @@ Function Pointers
  <LI><a href="#[2e]">Timer3B_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[4c]">Timer4A_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[4d]">Timer4B_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
- <LI><a href="#[4e]">Timer5A_Handler</a> from texas.o(i.Timer5A_Handler) referenced from startup.o(RESET)
+ <LI><a href="#[4e]">Timer5A_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[4f]">Timer5B_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[f]">UART0_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[10]">UART1_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
@@ -161,6 +160,7 @@ Function Pointers
  <LI><a href="#[59]">WideTimer4B_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[5a]">WideTimer5A_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[5b]">WideTimer5B_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
+ <LI><a href="#[7d]">_sputc</a> from printf1.o(i._sputc) referenced from printf1.o(i.__0sprintf$1)
  <LI><a href="#[7c]">main</a> from main.o(i.main) referenced from entry9a.o(.ARM.Collect$$$$0000000B)
  <LI><a href="#[39]">uDMA_Error</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[38]">uDMA_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
@@ -495,6 +495,9 @@ Global Symbols
 <P><STRONG><a name="[4d]"></a>Timer4B_Handler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup.o(RESET))
 <BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
 </UL>
+<P><STRONG><a name="[4e]"></a>Timer5A_Handler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup.o(RESET))
+<BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
+</UL>
 <P><STRONG><a name="[4f]"></a>Timer5B_Handler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup.o(RESET))
 <BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
 </UL>
@@ -574,7 +577,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Reset_Handler
 </UL>
 
-<P><STRONG><a name="[8d]"></a>_main_stk</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry2.o(.ARM.Collect$$$$00000001))
+<P><STRONG><a name="[91]"></a>_main_stk</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry2.o(.ARM.Collect$$$$00000001))
 
 <P><STRONG><a name="[80]"></a>_main_scatterload</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry5.o(.ARM.Collect$$$$00000004))
 <BR><BR>[Calls]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
@@ -584,33 +587,38 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
 </UL>
 
-<P><STRONG><a name="[8e]"></a>_main_clock</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry7b.o(.ARM.Collect$$$$00000008))
+<P><STRONG><a name="[92]"></a>_main_clock</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry7b.o(.ARM.Collect$$$$00000008))
 
-<P><STRONG><a name="[8f]"></a>_main_cpp_init</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry8b.o(.ARM.Collect$$$$0000000A))
+<P><STRONG><a name="[93]"></a>_main_cpp_init</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry8b.o(.ARM.Collect$$$$0000000A))
 
-<P><STRONG><a name="[90]"></a>_main_init</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry9a.o(.ARM.Collect$$$$0000000B))
+<P><STRONG><a name="[94]"></a>_main_init</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry9a.o(.ARM.Collect$$$$0000000B))
 
-<P><STRONG><a name="[91]"></a>__rt_lib_shutdown_fini</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry12b.o(.ARM.Collect$$$$0000000E))
+<P><STRONG><a name="[95]"></a>__rt_lib_shutdown_fini</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry12b.o(.ARM.Collect$$$$0000000E))
 
-<P><STRONG><a name="[92]"></a>__rt_final_cpp</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry10a.o(.ARM.Collect$$$$0000000F))
+<P><STRONG><a name="[96]"></a>__rt_final_cpp</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry10a.o(.ARM.Collect$$$$0000000F))
 
-<P><STRONG><a name="[93]"></a>__rt_final_exit</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry11a.o(.ARM.Collect$$$$00000011))
+<P><STRONG><a name="[97]"></a>__rt_final_exit</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry11a.o(.ARM.Collect$$$$00000011))
 
-<P><STRONG><a name="[94]"></a>DisableInterrupts</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text), UNUSED)
+<P><STRONG><a name="[85]"></a>DisableInterrupts</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Timer0A_InitVarKHzInt
+</UL>
 
-<P><STRONG><a name="[8c]"></a>EnableInterrupts</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text))
+<P><STRONG><a name="[8f]"></a>EnableInterrupts</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[84]"></a>StartCritical</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PeriodicTask2_Init
-</UL>
+<P><STRONG><a name="[98]"></a>StartCritical</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text), UNUSED)
 
-<P><STRONG><a name="[85]"></a>EndCritical</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PeriodicTask2_Init
-</UL>
+<P><STRONG><a name="[99]"></a>EndCritical</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text), UNUSED)
 
-<P><STRONG><a name="[95]"></a>WaitForInterrupt</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text), UNUSED)
+<P><STRONG><a name="[9a]"></a>WaitForInterrupt</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text), UNUSED)
+
+<P><STRONG><a name="[9b]"></a>__aeabi_uidiv</STRONG> (Thumb, 0 bytes, Stack size 12 bytes, uidiv.o(.text), UNUSED)
+
+<P><STRONG><a name="[8a]"></a>__aeabi_uidivmod</STRONG> (Thumb, 44 bytes, Stack size 12 bytes, uidiv.o(.text), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+</UL>
 
 <P><STRONG><a name="[81]"></a>__scatterload</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, init.o(.text))
 <BR><BR>[Calls]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main_after_scatterload
@@ -618,7 +626,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_main_scatterload
 </UL>
 
-<P><STRONG><a name="[96]"></a>__scatterload_rt2</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, init.o(.text), UNUSED)
+<P><STRONG><a name="[9c]"></a>__scatterload_rt2</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, init.o(.text), UNUSED)
 
 <P><STRONG><a name="[18]"></a>ADC0Seq0_Handler</STRONG> (Thumb, 26 bytes, Stack size 8 bytes, adct0atrigger.o(i.ADC0Seq0_Handler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = ADC0Seq0_Handler
@@ -628,84 +636,107 @@ Global Symbols
 <P><STRONG><a name="[1b]"></a>ADC0Seq3_Handler</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, adct0atrigger.o(i.ADC0Seq3_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
 </UL>
-<P><STRONG><a name="[88]"></a>ADC1_Init</STRONG> (Thumb, 176 bytes, Stack size 8 bytes, texas.o(i.ADC1_Init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = ADC1_Init
-</UL>
-<BR>[Called By]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TExaS_SetTask
-</UL>
-
-<P><STRONG><a name="[8a]"></a>ADC_In89</STRONG> (Thumb, 52 bytes, Stack size 0 bytes, adcswtrigger.o(i.ADC_In89))
+<P><STRONG><a name="[83]"></a>ADC_In89</STRONG> (Thumb, 52 bytes, Stack size 0 bytes, adcswtrigger.o(i.ADC_In89))
 <BR><BR>[Called By]<UL><LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Timer0A_Handler
 </UL>
 
-<P><STRONG><a name="[8b]"></a>LaunchPad_Init</STRONG> (Thumb, 70 bytes, Stack size 0 bytes, launchpad.o(i.LaunchPad_Init))
+<P><STRONG><a name="[8d]"></a>ADC_Init89</STRONG> (Thumb, 198 bytes, Stack size 8 bytes, adcswtrigger.o(i.ADC_Init89))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = ADC_Init89
+</UL>
+<BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[8c]"></a>LaunchPad_Init</STRONG> (Thumb, 70 bytes, Stack size 0 bytes, launchpad.o(i.LaunchPad_Init))
 <BR><BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[87]"></a>PLL_Init</STRONG> (Thumb, 120 bytes, Stack size 0 bytes, pll.o(i.PLL_Init))
-<BR><BR>[Called By]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TExaS_SetTask
-</UL>
-
-<P><STRONG><a name="[83]"></a>PeriodicTask2_Init</STRONG> (Thumb, 160 bytes, Stack size 24 bytes, texas.o(i.PeriodicTask2_Init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24 + Unknown Stack Size
-<LI>Call Chain = PeriodicTask2_Init
-</UL>
-<BR>[Calls]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EndCritical
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StartCritical
-</UL>
-<BR>[Called By]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TExaS_SetTask
-</UL>
-
-<P><STRONG><a name="[7d]"></a>ScopeTask</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, main.o(i.ScopeTask))
-<BR>[Address Reference Count : 1]<UL><LI> main.o(i.main)
-</UL>
-<P><STRONG><a name="[86]"></a>TExaS_SetTask</STRONG> (Thumb, 40 bytes, Stack size 8 bytes, texas.o(i.TExaS_SetTask))
-<BR><BR>[Stack]<UL><LI>Max Depth = 32 + Unknown Stack Size
-<LI>Call Chain = TExaS_SetTask &rArr; PeriodicTask2_Init
-</UL>
-<BR>[Calls]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Init
-<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PeriodicTask2_Init
-<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC1_Init
-<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PLL_Init
-</UL>
-<BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<P><STRONG><a name="[8b]"></a>PLL_Init</STRONG> (Thumb, 120 bytes, Stack size 0 bytes, pll.o(i.PLL_Init))
+<BR><BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[1d]"></a>Timer0A_Handler</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, main.o(i.Timer0A_Handler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = Timer0A_Handler
 </UL>
-<BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_In89
+<BR>[Calls]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_In89
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
 </UL>
-<P><STRONG><a name="[4e]"></a>Timer5A_Handler</STRONG> (Thumb, 16 bytes, Stack size 8 bytes, texas.o(i.Timer5A_Handler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = Timer5A_Handler
+<P><STRONG><a name="[84]"></a>Timer0A_InitVarKHzInt</STRONG> (Thumb, 122 bytes, Stack size 16 bytes, main.o(i.Timer0A_InitVarKHzInt))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16 + Unknown Stack Size
+<LI>Call Chain = Timer0A_InitVarKHzInt
 </UL>
-<BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
+<BR>[Calls]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DisableInterrupts
 </UL>
-<P><STRONG><a name="[89]"></a>UART_Init</STRONG> (Thumb, 138 bytes, Stack size 0 bytes, texas.o(i.UART_Init))
-<BR><BR>[Called By]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TExaS_SetTask
+<BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[97]"></a>__scatterload_copy</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_copy), UNUSED)
-
-<P><STRONG><a name="[98]"></a>__scatterload_null</STRONG> (Thumb, 2 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_null), UNUSED)
-
-<P><STRONG><a name="[99]"></a>__scatterload_zeroinit</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_zeroinit), UNUSED)
-
-<P><STRONG><a name="[7c]"></a>main</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, main.o(i.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 32 + Unknown Stack Size
-<LI>Call Chain = main &rArr; TExaS_SetTask &rArr; PeriodicTask2_Init
+<P><STRONG><a name="[8e]"></a>UART_Init</STRONG> (Thumb, 118 bytes, Stack size 0 bytes, uart.o(i.UART_Init))
+<BR><BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
-<BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TExaS_SetTask
-<LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LaunchPad_Init
-<LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EnableInterrupts
+
+<P><STRONG><a name="[87]"></a>UART_OutChar</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, uart.o(i.UART_OutChar))
+<BR><BR>[Called By]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_OutString
+<LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[86]"></a>UART_OutString</STRONG> (Thumb, 22 bytes, Stack size 4 bytes, uart.o(i.UART_OutString))
+<BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = UART_OutString
+</UL>
+<BR>[Calls]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_OutChar
+</UL>
+<BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[88]"></a>__0sprintf$1</STRONG> (Thumb, 34 bytes, Stack size 24 bytes, printf1.o(i.__0sprintf$1), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[7d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_sputc
+<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+</UL>
+
+<P><STRONG><a name="[9d]"></a>__1sprintf$1</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printf1.o(i.__0sprintf$1), UNUSED)
+
+<P><STRONG><a name="[90]"></a>__2sprintf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printf1.o(i.__0sprintf$1))
+<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = __2sprintf
+</UL>
+<BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[9e]"></a>__scatterload_copy</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_copy), UNUSED)
+
+<P><STRONG><a name="[9f]"></a>__scatterload_null</STRONG> (Thumb, 2 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_null), UNUSED)
+
+<P><STRONG><a name="[a0]"></a>__scatterload_zeroinit</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_zeroinit), UNUSED)
+
+<P><STRONG><a name="[7c]"></a>main</STRONG> (Thumb, 202 bytes, Stack size 824 bytes, main.o(i.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 848 + Unknown Stack Size
+<LI>Call Chain = main &rArr; __2sprintf
+</UL>
+<BR>[Calls]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_OutString
+<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_OutChar
+<LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Init
+<LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init89
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Timer0A_InitVarKHzInt
+<LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LaunchPad_Init
+<LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PLL_Init
+<LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EnableInterrupts
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DisableInterrupts
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> entry9a.o(.ARM.Collect$$$$0000000B)
 </UL><P>
 <H3>
 Local Symbols
-</H3><P>
+</H3>
+<P><STRONG><a name="[89]"></a>_printf_core</STRONG> (Thumb, 336 bytes, Stack size 88 bytes, printf1.o(i._printf_core), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
+</UL>
+<BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sprintf$1
+</UL>
+
+<P><STRONG><a name="[7d]"></a>_sputc</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, printf1.o(i._sputc))
+<BR><BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sprintf$1
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> printf1.o(i.__0sprintf$1)
+</UL><P>
 <H3>
 Undefined Global Symbols
 </H3><HR></body></html>
