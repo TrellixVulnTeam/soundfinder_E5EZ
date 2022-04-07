@@ -39,9 +39,10 @@ uint16_t numSamples; // TODO: set by python code via UART
 /* ADC */
 uint8_t ADCMailbox;
 uint32_t ADCvalue[2];
+uint32_t ADCperiod;
 uint32_t count;
 // sampling timer
-void Timer0A_Init1KHzInt(void) {
+void Timer0A_InitVarKHzInt(uint16_t sampling_rate_khz, uint32_t bus_clock_mhz) {
   volatile uint32_t delay;
   DisableInterrupts();
   // **** general initialization ****
@@ -52,9 +53,8 @@ void Timer0A_Init1KHzInt(void) {
   // **** timer0A initialization ****
                                    // configure for periodic mode
   TIMER0_TAMR_R = TIMER_TAMR_TAMR_PERIOD;
-  // TIMER0_TAILR_R = 79999;         // start value for 1 KHz interrupts (was 79999)
-	TIMER0_TAILR_R = 1665;			//39999 is 2 khz	9999 is 8 KHz0  2499 is 32 KHz
-	// 1665 = 48 KHz
+  ADCPeriod = ((bus_clock_mhz * 1000) / (sampling_rate_khz)) - 1;
+  TIMER0_TAILR_R = ADCPeriod;      // 39999 = 2 khz, 9999 = 8 KHz, 2499 = 32 KHz, 1665 = 48 KHz, 79999 = 1 KHz, 4999 = 16 KHz
   TIMER0_IMR_R |= TIMER_IMR_TATOIM;// enable timeout (rollover) interrupt
   TIMER0_ICR_R = TIMER_ICR_TATOCINT;// clear timer0A timeout flag
   TIMER0_CTL_R |= TIMER_CTL_TAEN;  // enable timer0A 32-b, periodic, interrupts
@@ -82,7 +82,8 @@ int main(void) {
 	LaunchPad_Init();
 	//ADC0_InitSWTriggerSeq3_Ch9();  // 1 channel (PE4)
 	ADC_Init89(); 	// 2 channels (PE4,PE5)
-	Timer0A_Init1KHzInt();  // hardware timer
+	//Timer0A_Init1KHzInt();  // hardware timer
+	Timer0A_InitVarKHzInt(8, 80);  // hardware timer
 	UART_Init();  // serial
 #else
 	// pick one of the following three lines, all three set PLL to 80 MHz
