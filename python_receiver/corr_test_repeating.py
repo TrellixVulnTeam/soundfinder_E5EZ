@@ -38,9 +38,9 @@ while True:
     print("Incident Mic: {}".format(incident_mic))
     print("Incident Angle: {}deg".format(round(incident_angle, 3)))
 
-    # plt.ylabel("Correlation")
-    # plt.xlabel("Delay/Lag")
-    # plt.plot(xc, yc, marker='o')
-    # plt.annotate('argmax={}@{}ms'.format(round(yc[lag_sample_delay], 3), lag_time_delay),  (lag_time_delay, yc[yc.argmax()]), ha='center')
-    # plt.show()
+# plt.ylabel("Correlation")
+# plt.xlabel("Delay/Lag")
+# plt.plot(xc, yc, marker='o')
+# plt.annotate('argmax={}@{}ms'.format(round(yc[lag_sample_delay], 3), lag_time_delay),  (lag_time_delay, yc[yc.argmax()]), ha='center')
+# plt.show()
 
