@@ -3,6 +3,7 @@
 import numpy as np
 import scipy.fftpack
 import matplotlib.pyplot as plt
+import matlab.engine
 
 from receiver import Receiver
 
@@ -47,25 +48,34 @@ if __name__ == "__main__":
     fft = FFT()
     # receiver = Receiver("COM27")
     receiver = Receiver("sin-unfiltered", use_file=True)
+    receiver.start_matlab()
 
     data = receiver.receive(192)
 
     # filter
-    ch1 = receiver.filter(data[:,0])
-    ch2 = receiver.filter(data[:,1])
+    # ch1 = receiver.filter(data[:,0])
+    # ch2 = receiver.filter(data[:,1])
+
+    ch1 = receiver.matlab_filter(matlab.uint16(data[:,0].tolist()))
+    ch2 = receiver.matlab_filter(matlab.uint16(data[:,1].tolist()))
+    # ch1 = ch1.toarray()
+    # ch2 = ch2.toarray()
+    print(ch1)
 
     t = np.linspace(0, 1/8000, 192)
     plt.plot(t, data[:,0], 'b')
     plt.plot(t, data[:,1], 'r')
     plt.show()
 
-
+    plt.plot(t, ch1[0], 'b')
+    plt.plot(t, ch2[0], 'r')
+    plt.show()
 
     xf, yf1, yf2 = fft.fft(data[:,0], data[:,1])
     xf_filter, yf1_filter, yf2_filter = fft.fft(ch1, ch2)
 
     fft.graph_fft_data(xf, yf1, yf2)
 
-    fft.graph_fft_data(xf_filter, yf1_filter, yf2_filter)
+    fft.graph_fft_data(xf_filter, yf1_filter[0], yf2_filter[0])
 
     # np.savetxt("pog", data, delimiter=" ", fmt="%u")

@@ -123,10 +123,13 @@ class Receiver:
 
         return np.prod(G)*signal.sosfilt(SOS, data)
 
-
     def start_matlab(self):
         import matlab.engine
-        eng = matlab.engine.start_matlab()
+        self.eng = matlab.engine.start_matlab()
+
+    def matlab_filter(self, samples):
+        out = self.eng.filter_1(samples)
+        return out
 
 
 if __name__ == "__main__":
