@@ -45,12 +45,13 @@ class FFT:
 
 if __name__ == "__main__":
     # fft = FFT(sampling_rate=32000)
-    fft = FFT()
+    fft = FFT(sampling_rate=24000)
     # receiver = Receiver("COM27")
-    receiver = Receiver("sin-unfiltered", use_file=True)
+    receiver = Receiver("sin_16000_788hz", use_file=True)
     receiver.start_matlab()
 
     data = receiver.receive(192)
+    print("Data received")
 
     # filter
     # ch1 = receiver.filter(data[:,0])
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     # ch2 = ch2.toarray()
     print(ch1)
 
-    t = np.linspace(0, 1/8000, 192)
+    t = np.linspace(0, 1/48000, 192)
     plt.plot(t, data[:,0], 'b')
     plt.plot(t, data[:,1], 'r')
     plt.show()

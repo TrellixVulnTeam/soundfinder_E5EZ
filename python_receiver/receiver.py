@@ -134,63 +134,12 @@ class Receiver:
 
 if __name__ == "__main__":
 
-    # r = Receiver("COM27")
-    r = Receiver("sin-unfiltered", use_file=True)
-    r.start_matlab()
+    r = Receiver("COM27")
     data = r.receive(192)
 
-    # plt.plot(data[:,1], "b")
-    # plt.plot(data[:,2], "r")
-    # plt.show()
-
-    N = 192
-
-    T = 1/8000 # fake sampling rate of 2000 Hz
-
-    x = np.linspace(0, N*T, N)
-    y = data[:,1]
-    # y = np.sin(2*np.pi*440*x)
-
-    yf = scipy.fftpack.fft(y)
-    xf= np.linspace(0, 1//(2*T), N//2)
-
-    plt.ylabel("Amplitude")
-    plt.xlabel("Frequency [Hz]")
-    plt.plot(xf, 2/N * np.abs(yf[:N//2]))
+    t = np.linspace(0, 1 / 16000, 192)
+    plt.plot(t, data[:,0], 'b')
+    plt.plot(t, data[:,1], 'r')
     plt.show()
 
-
-
-    #
-    # # r = Receiver("test_data", use_file=True)
-    #
-    # # data = r.receive(10)
-    #
-    # # print(data)
-    #
-    # # r = Receiver("COM27")
-    # r = Receiver("run1", use_file=True)
-    #
-    # data = r.receive(192)
-    #
-    # # plt.plot(data[:,1], "b")
-    # # plt.plot(data[:,2], "r")
-    # # plt.show()
-    #
-    # N = 192
-    #
-    # T = 1/2000 # fake sampling rate of 2000 Hz
-    #
-    # x = np.linspace(0, N*T, N)
-    # y = data[:,2]
-    # # y = np.sin(2*np.pi*440*x)
-    #
-    # yf = scipy.fftpack.fft(y)
-    # xf= np.linspace(0, 1//(2*T), N//2)
-    #
-    # plt.ylabel("Amplitude")
-    # plt.xlabel("Frequency [Hz]")
-    # plt.plot(xf, 2/N * np.abs(yf[:N//2]))
-    # plt.show()
-    #
-    # # np.savetxt("run1", data, delimiter=" ", fmt="%u")
+    np.savetxt("sin_16000_788hz", data, delimiter=" ", fmt="%u")
