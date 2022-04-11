@@ -5,13 +5,13 @@ from scipy import signal
 
 from receiver import Receiver
 
-source = "sample_gen_example1_24kHz_800Hz_0.0007ms.txt"
-sampling_rate = 24      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
+source = "sin-unfiltered"
+sampling_rate = 8       # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
 frame_size = 192        # #samples
 speed_sound = 343       # 343 m/sec = speed of sound in air
 mic_distance = 260      # mm
-filter_lowcut = 500.0
-filter_highcut = 1100.0
+filter_lowcut = 300.0
+filter_highcut = 1200.0
 frame_length = frame_size / (sampling_rate * 1000)  # ms
 
 def butter_bandpass(lowcut, highcut, fs, order=5):
@@ -39,6 +39,8 @@ y_b_pre = data[:,1]
 fs = sampling_rate * 1000
 y_a = butter_bandpass_filter(y_a_pre, filter_lowcut, filter_highcut, fs, order=12)
 y_b = butter_bandpass_filter(y_b_pre, filter_lowcut, filter_highcut, fs, order=12)
+# y_a = y_a_pre
+# y_b = y_b_pre
 
 # correlation
 yc = signal.correlate(y_a - np.mean(y_a), y_b - np.mean(y_b), mode='full')
@@ -62,16 +64,23 @@ ax1.set_ylabel("Original Signal")
 ax1.plot(x, y_a_pre, color='red', marker='o')
 ax1.plot(x, y_b_pre, color='blue', marker='o')
 ax1.tick_params(axis='y')
-ax2 = ax1.twinx()
-ax2.set_ylabel("Filtered Signal")
-ax2.plot(x, y_a, color='purple')
-ax2.plot(x, y_b, color='green')
-ax2.tick_params(axis='y')
 fig.tight_layout()
+fig.savefig('corr_test_original_plot.png')
+plt.show()
+
+fig, ax1 = plt.subplots()
+ax1.set_xlabel("Sample")
+ax1.set_ylabel("Filtered Signal")
+ax1.plot(x, y_a, color='purple')
+ax1.plot(x, y_b, color='green')
+ax1.tick_params(axis='y')
+fig.tight_layout()
+fig.savefig('corr_test_filtered_plot.png')
 plt.show()
 
 plt.ylabel("Correlation")
 plt.xlabel("Delay/Lag")
 plt.plot(xc, yc, marker='o')
 plt.annotate('argmax={}@{}ms'.format(round(yc[lag_sample_delay], 3), lag_time_delay),  (lag_time_delay, yc[yc.argmax()]), ha='center')
+plt.savefig('corr_test_correlation_plot.png')
 plt.show()
