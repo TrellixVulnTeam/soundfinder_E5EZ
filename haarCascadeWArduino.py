@@ -189,8 +189,9 @@ if not cap.isOpened:
 #     data = arduino.readline()
 #     return data
 
+framex = 640
 def angle_calculation(x):
-    num = math.sqrt((320**2)-((320-x)**2))
+    num = math.sqrt(((framex/2)**2)-((framex/2-x)**2))
     denom = x-320
     angle = math.degrees(math.atan(num/denom))
     if angle < 0:
@@ -201,7 +202,7 @@ startTime = time.time()
 while True:
     ret, frame = cap.read()
     # resizing for faster detection
-    frame = cv.resize(frame, (640, 480))
+    frame = cv.resize(frame, (framex, 480))
     if frame is None:
         print('--(!) No captured frame -- Break!')
         break
