@@ -31,6 +31,7 @@
 #include "../inc/ADCSWTrigger.h"
 #include "../inc/SysTickInts.h"
 #include "../inc/LaunchPad.h"
+#include "../inc/UART.h"
 
 #define PWM_PERIOD 40000
 #define SERVO_NEUTRAL 12000
@@ -83,7 +84,10 @@ int main(void){
 	char incidentMic;
   //PLL_Init(Bus16MHz);
 	PLL_Init(Bus80MHz);       // 80  MHz
-	UART_Init();              // initialize UART
+	
+	//NOTE: I don't know why this one needs a parameter to be passed whereas previous times it didn't. -Evelyn
+	UART_Init(1);              // initialize UART
+	
 	Servo_Init(); // Initialize PWM control for servo
 	LaunchPad_Init();
 	ADC0_InitSWTriggerSeq3_Ch9();
