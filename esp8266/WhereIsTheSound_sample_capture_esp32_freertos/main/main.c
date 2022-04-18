@@ -14,15 +14,18 @@
 #include "freertos/task.h"
 #include "sdkconfig.h"
 
-#define FRAME_SIZE 1024
+#define FRAME_SIZE 1024	  // # samples
+#define SAMPLING_RATE 32  // kHz
 
 volatile uint16_t ch_1_samples[FRAME_SIZE];
 volatile uint16_t ch_2_samples[FRAME_SIZE];
-volatile uint32_t frameCounter = 0;
-volatile uint32_t ch_1_frame_pointer = 0;
-volatile uint32_t ch_2_frame_pointer = 0;
-volatile uint16_t ch_1_send = 0;
-volatile uint16_t ch_2_send = 0;
+// volatile uint16_t frameCounter = 0;
+volatile uint16_t ch_1_frame_pointer = 0;
+volatile uint16_t ch_2_frame_pointer = 0;
+volatile bool ch_1_send = 0;
+volatile bool ch_2_send = 0;
+
+/* ESP-IDF ADC DMA Initialization */
 
 #define TIMES 256
 #define GET_UNIT(x) ((x >> 3) & 0x1)
@@ -55,9 +58,14 @@ static uint16_t adc2_chan_mask = BIT(0);
 static adc_channel_t channel[3] = {ADC1_CHANNEL_2, ADC1_CHANNEL_3, (ADC2_CHANNEL_0 | 1 << 3)};
 #endif
 #if CONFIG_IDF_TARGET_ESP32S2
-static uint16_t adc1_chan_mask = BIT(2) | BIT(3);
+// modified from boilerplate to just 2 ADC channels, not 3 (1 per ADC unit)
+static uint16_t adc1_chan_mask = BIT(2);
 static uint16_t adc2_chan_mask = BIT(0);
-static adc_channel_t channel[3] = {ADC1_CHANNEL_2, ADC1_CHANNEL_3, (ADC2_CHANNEL_0 | 1 << 3)};
+static adc_channel_t channel[2] = {ADC1_CHANNEL_2, (ADC2_CHANNEL_0 | 1 << 3)};
+// originally:
+// static uint16_t adc1_chan_mask = BIT(2) | BIT(3);
+// static uint16_t adc2_chan_mask = BIT(0);
+// static adc_channel_t channel[3] = {ADC1_CHANNEL_2, ADC1_CHANNEL_3, (ADC2_CHANNEL_0 | 1 << 3)};
 #endif
 #if CONFIG_IDF_TARGET_ESP32
 static uint16_t adc1_chan_mask = BIT(7);
@@ -79,7 +87,7 @@ static void continuous_adc_init(uint16_t adc1_chan_mask, uint16_t adc2_chan_mask
 	adc_digi_configuration_t dig_cfg = {
 		.conv_limit_en = ADC_CONV_LIMIT_EN,
 		.conv_limit_num = 250,
-		.sample_freq_hz = 32 * 1000,
+		.sample_freq_hz = SAMPLING_RATE * 1000,
 		.conv_mode = ADC_CONV_MODE,
 		.format = ADC_OUTPUT_TYPE,
 	};
@@ -112,6 +120,7 @@ static bool check_valid_data(const adc_digi_output_data_t *data) {
 }
 #endif
 
+/* ESP32 Entry Point */
 void app_main(void) {
 	esp_err_t ret;
 	uint32_t ret_num = 0;
@@ -125,7 +134,7 @@ void app_main(void) {
 		ret = adc_digi_read_bytes(result, TIMES, &ret_num, ADC_MAX_DELAY);
 		if (ret == ESP_OK || ret == ESP_ERR_INVALID_STATE) {
 			if (ret == ESP_ERR_INVALID_STATE) {
-				/**
+				/** N.B. WARNING FROM ESP-IDF BOILERPLATE CODE
 				 * @note 1
 				 * Issue:
 				 * As an example, we simply print the result out, which is super slow. Therefore the conversion is too
@@ -143,6 +152,9 @@ void app_main(void) {
 			}
 
 			// ESP_LOGI("TASK:", "ret is %x, ret_num is %d", ret, ret_num);
+			uint8_t unit = 0;
+			uint8_t channel = 0;
+			uint16_t data = 0;
 			for (int i = 0; i < ret_num; i += ADC_RESULT_BYTE) {
 				adc_digi_output_data_t *p = (void *)&result[i];
 #if CONFIG_IDF_TARGET_ESP32
@@ -151,12 +163,16 @@ void app_main(void) {
 				if (ADC_CONV_MODE == ADC_CONV_BOTH_UNIT || ADC_CONV_MODE == ADC_CONV_ALTER_UNIT) {
 					if (check_valid_data(p)) {
 						// ESP_LOGI(TAG, "Unit: %d,_Channel: %d, Value: %d", p->type2.unit + 1, p->type2.channel, p->type2.data);
-						uint16_t channel = p->type2.channel;
-						uint16_t data = p->type2.data;
-						if (channel == 2) {
+
+						// fill buffer and send to serial
+						unit = p->type2.unit;
+						channel = p->type2.channel;
+						data = p->type2.data;
+
+						if (unit == 0 && channel == 2) {
 							ch_1_samples[ch_1_frame_pointer] = data;
 							ch_1_frame_pointer++;
-						} else if (channel == 3) {
+						} else if (unit == 1 && channel == 0) {
 							ch_2_samples[ch_2_frame_pointer] = data;
 							ch_2_frame_pointer++;
 						}
@@ -169,7 +185,7 @@ void app_main(void) {
 							ch_2_send = 1;
 						}
 						if (ch_1_send == 1 && ch_2_send == 1) {
-							printf("f\n");
+							printf("s\n");
 							for (int f = 0; f < FRAME_SIZE; f++) {
 								printf("%d %d\n", ch_1_samples[f], ch_2_samples[f]);
 							}
@@ -177,6 +193,7 @@ void app_main(void) {
 							ch_1_send = 0;
 							ch_2_send = 0;
 						}
+
 					} else {
 						// abort();
 						ESP_LOGI(TAG, "Invalid data [%d_%d_%x]", p->type2.unit + 1, p->type2.channel, p->type2.data);
