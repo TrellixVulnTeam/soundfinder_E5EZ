@@ -16,7 +16,7 @@ class Receiver:
 
     eng = None
 
-    MAX_SAMPLES = 216
+    MAX_SAMPLES = 1024  # 216  # 192
 
 
 
@@ -70,6 +70,8 @@ class Receiver:
 
             raw_data = self.serial_port.readline().split()  # blocking
             # print(raw_data)
+            if len(raw_data) != 2:
+                break
             data[i] = raw_data  # blocking
             # print(data[i])
             i = i + 1
