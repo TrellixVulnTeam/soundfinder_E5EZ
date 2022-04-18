@@ -25,11 +25,13 @@
  http://users.ece.utexas.edu/~valvano/
  */
 #include <stdint.h>
+#include <stdio.h>
 #include "../inc/PLL.h"
 #include "../inc/PWM.h"
 #include "../inc/ADCSWTrigger.h"
 #include "../inc/SysTickInts.h"
 #include "../inc/LaunchPad.h"
+#include "../inc/UART.h"
 
 #define PWM_PERIOD 40000
 #define SERVO_NEUTRAL 12000
@@ -78,13 +80,29 @@ void SysTick_Handler(void) {
 }
 
 int main(void){
-  PLL_Init(Bus16MHz);
+	int32_t angle = 0;
+	char incidentMic;
+  //PLL_Init(Bus16MHz);
+	PLL_Init(Bus80MHz);       // 80  MHz
+	
+	//NOTE: I don't know why this one needs a parameter to be passed whereas previous times it didn't. -Evelyn
+	UART_Init(1);              // initialize UART
+	
 	Servo_Init(); // Initialize PWM control for servo
 	LaunchPad_Init();
 	ADC0_InitSWTriggerSeq3_Ch9();
-	SysTick_Init(1000000); // Trigger ~15 interrupts per second
-	SysTick_Start();
+	
+	// don't need systick adc when using uart
+	//SysTick_Init(1000000); // Trigger ~15 interrupts per second
+	//SysTick_Start();
   while(1){
-		WaitForInterrupt();
+		//WaitForInterrupt();
+		incidentMic = UART_InChar();
+		angle = UART_InUDec();
+		if(incidentMic == 'B'){
+			angle = -angle;
+		}
+		Servo_SetPosition(1, angle);	//only turning horizontal motor for now
+		UART_OutString("confirm");
   }
 }
