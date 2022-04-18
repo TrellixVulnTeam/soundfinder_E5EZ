@@ -1,11 +1,17 @@
-
+#include "driver/adc.h"
+#include "hal/adc_hal.h"
+#include "soc/adc_channel.h"
 
 #define PROFILE_PIN 17
+#define MIC_A_PIN 1
+#define MIC_A_CHAN ADC1_GPIO35_CHANNEL
+#define MIC_B_PIN 2
+#define MIC_B_CHAN ADC1_GPIO36_CHANNEL
 
 #define SAMPLING_RATE_KHZ 25
 #define BUS_CLOCK_MHZ 80
 #define TIMER_DIVIDER 80
-#define FRAME_SIZE 5000
+#define FRAME_SIZE 100
 
 typedef struct Message {
   uint16_t ch_1;  // sample value from mic A
@@ -13,21 +19,29 @@ typedef struct Message {
 } message_t;
 volatile message_t frame_msgs[FRAME_SIZE];
 
-volatile uint8_t profile_val;
-volatile uint16_t interruptCounter;
-volatile uint32_t frameCounter;
-volatile uint32_t framePointer;
+volatile uint8_t profile_val = 0;
+volatile uint16_t interruptCounter = 0;
+volatile uint32_t frameCounter = 0;
+volatile uint32_t framePointer = 0;
  
 hw_timer_t * timer = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+
+uint16_t IRAM_ATTR local_adc1_read(int channel) {
+  uint16_t value = 0;
+  adc_hal_convert(ADC_UNIT_1, MIC_A_CHAN, &value);
+  return value;
+}
  
 void IRAM_ATTR onTimer() {
   portENTER_CRITICAL_ISR(&timerMux);
   
   interruptCounter++;
 
-  frame_msgs[framePointer].ch_1 = 3;
-  frame_msgs[framePointer].ch_2 = 4;
+  int x = local_adc1_read(MIC_A_CHAN);
+
+//  frame_msgs[framePointer].ch_1 = analogRead(MIC_A_CHAN);
+//  frame_msgs[framePointer].ch_2 = analogRead(MIC_B_CHAN);
 
   framePointer++;
   if (framePointer >= FRAME_SIZE)
@@ -43,6 +57,9 @@ void IRAM_ATTR onTimer() {
 void setup() {
  
   Serial.begin(115200);
+  
+  pinMode(MIC_A_PIN, INPUT);
+  pinMode(MIC_B_PIN, INPUT);
 
   profile_val = LOW;
   pinMode(PROFILE_PIN, OUTPUT);
@@ -67,7 +84,8 @@ void loop() {
     portENTER_CRITICAL(&timerMux);
     interruptCounter = 0;
     portEXIT_CRITICAL(&timerMux);
-    
+
+    /*
     Serial.printf("f\n");
     for (uint32_t i = 0; i < FRAME_SIZE; i++) {
       Serial.printf("%d %d\n", frame_msgs[i].ch_1, frame_msgs[i].ch_2);
@@ -75,6 +93,7 @@ void loop() {
     Serial.printf("\n");
  
     frameCounter++;
+    */
  
   }
 }
