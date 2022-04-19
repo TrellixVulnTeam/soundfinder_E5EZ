@@ -133,33 +133,35 @@ class Receiver:
         out = self.eng.filter_1(samples)
         return out
 
-
 if __name__ == "__main__":
+    r = Receiver("COM3")
+    print(r)
+# if __name__ == "__main__":
 
-    # r = Receiver("COM27")
-    r = Receiver("sin-unfiltered", use_file=True)
-    r.start_matlab()
-    data = r.receive(216)
+#     # r = Receiver("COM27")
+#     r = Receiver("sin-unfiltered", use_file=True)
+#     r.start_matlab()
+#     data = r.receive(216)
 
-    # plt.plot(data[:,1], "b")
-    # plt.plot(data[:,2], "r")
-    # plt.show()
+#     # plt.plot(data[:,1], "b")
+#     # plt.plot(data[:,2], "r")
+#     # plt.show()
 
-    N = 216
+#     N = 216
 
-    T = 1/8000 # fake sampling rate of 2000 Hz
+#     T = 1/8000 # fake sampling rate of 2000 Hz
 
-    x = np.linspace(0, N*T, N)
-    y = data[:,1]
-    # y = np.sin(2*np.pi*440*x)
+#     x = np.linspace(0, N*T, N)
+#     y = data[:,1]
+#     # y = np.sin(2*np.pi*440*x)
 
-    yf = scipy.fftpack.fft(y)
-    xf= np.linspace(0, 1//(2*T), N//2)
+#     yf = scipy.fftpack.fft(y)
+#     xf= np.linspace(0, 1//(2*T), N//2)
 
-    plt.ylabel("Amplitude")
-    plt.xlabel("Frequency [Hz]")
-    plt.plot(xf, 2/N * np.abs(yf[:N//2]))
-    plt.show()
+#     plt.ylabel("Amplitude")
+#     plt.xlabel("Frequency [Hz]")
+#     plt.plot(xf, 2/N * np.abs(yf[:N//2]))
+#     plt.show()
 
 
 

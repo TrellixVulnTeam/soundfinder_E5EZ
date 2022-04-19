@@ -11,14 +11,14 @@ from receiver import Receiver
 
 from cross_corr_func import getAngle
 
-source = "sample_gen_example1_24kHz_800Hz_0.0003ms.txt"
-r = Receiver(source, use_file=True)
+#source = "COM4"
+#r = Receiver(source, use_file=False)
 sampling_rate = 24 #kHz
 frame_size = 216 
 mic_distance = 260 #mm
 current_angle = 0   #degrees -900 to 900
 
-tm4c = serial.Serial('COM3')    #adjust port as needed
+tm4c = serial.Serial("COM3", 115200)    #adjust port as needed
 
 while True:
     #incident_angle, incident_mic = getAngle(r, sampling_rate, frame_size, mic_distance)
