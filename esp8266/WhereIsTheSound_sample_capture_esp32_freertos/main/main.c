@@ -14,8 +14,8 @@
 #include "freertos/task.h"
 #include "sdkconfig.h"
 
-#define FRAME_SIZE 1024	  // # samples
-#define SAMPLING_RATE 32  // kHz
+#define FRAME_SIZE 1024	  // # samples (1024)
+#define SAMPLING_RATE 32  // kHz (32)
 
 volatile uint16_t ch_1_samples[FRAME_SIZE];
 volatile uint16_t ch_2_samples[FRAME_SIZE];
