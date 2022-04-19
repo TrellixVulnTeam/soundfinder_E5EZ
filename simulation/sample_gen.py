@@ -6,7 +6,7 @@ output_name = 'example1'
 # simulated mic settings
 speed_sound = 343       # 343 m/sec = speed of sound in air
 mic_distance = 260      # mm
-incident_angle = 10     # degrees
+incident_angle = 80     # degrees
 mic_delay_a = 0         # ms
 mic_delay_b =  math.cos((math.pi / 180.0) * incident_angle) * (mic_distance / 1000) / speed_sound
 # mic_delay_b = 0.0010  # ms
@@ -14,8 +14,8 @@ mic_noise_a = 15        # %
 mic_noise_b = 30        # %
 # simulated freq settings
 sin_freq = 800          # Hz or cycles/sec
-sampling_rate = 24      # kHz or samples/sec
-frame_size = 192        # #samples
+sampling_rate = 32      # kHz or samples/sec
+frame_size = 1024       # #samples
 adc_resolution = 4096   # ADC range/resolution
 adc_amp_cutoff = 2096   # amplifier amplitude cutoff
 # calculate further settings

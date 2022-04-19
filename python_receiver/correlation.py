@@ -5,21 +5,21 @@ import scipy.fftpack
 import matplotlib.pyplot as plt
 
 # sampling & correlation settings
-source_use_file = False   # use device or file
-source = "/dev/cu.SLAB_USBtoUART" if not source_use_file else "sample_gen_example1_24kHz_800Hz_0.0003ms.txt"
+source_use_file = True    # use device or file
+source = "/dev/cu.SLAB_USBtoUART" if not source_use_file else "data/sample_gen_example1_32kHz_800Hz_0.0001ms.txt"
 sampling_rate = 32        # kHz  -  MUST MATCH ESP
 frame_size = 1024         # #samples  -  MUST MATCH ESP
-mic_distance = 75         # mm  -  MUST MATCH SETUP
+mic_distance = 260        # mm  -  MUST MATCH SETUP
 speed_sound = 343         # 343 m/sec = speed of sound in air
-average_delays = 2        # rolling average on sample delay (set to 0 for none)
+average_delays = 0        # rolling average on sample delay (set to 0 for none)
 normalize_signal = False  # normalize before correlation
-filter_on = True         # butterworth bandpass filter
+filter_on = False         # butterworth bandpass filter
 filter_lowcut = 400.0     # Hz
 filter_highcut = 1400.0   # Hz
 filter_order = 12         # filter order
-repeat = True             # sample forever or only once
+repeat = False            # sample forever or only once
 graph_samples = True      # generate plot (takes more time)
-angle_edge_calib = 25 #40 # observed incident angle edge (to calibrate, update with incident angle with sound source at edge)
+angle_edge_calib = 0  #25 # observed incident angle edge (to calibrate, update with incident angle with sound source at edge; 0 for no fine-tuning; usually between 15-45)
 angle_middle_calib = 90   # observed incident angle middle (should be 90)
 frame_length = frame_size / (sampling_rate * 1000)  # sec
 
