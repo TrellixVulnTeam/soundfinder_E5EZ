@@ -13,13 +13,13 @@ mic_distance = 75         # mm  -  MUST MATCH SETUP
 speed_sound = 343         # 343 m/sec = speed of sound in air
 average_delays = 2        # rolling average on sample delay (set to 0 for none)
 normalize_signal = False  # normalize before correlation
-filter_on = True          # butterworth bandpass filter
-filter_lowcut = 500.0     # Hz
-filter_highcut = 1200.0   # Hz
+filter_on = True         # butterworth bandpass filter
+filter_lowcut = 400.0     # Hz
+filter_highcut = 1400.0   # Hz
 filter_order = 12         # filter order
 repeat = True             # sample forever or only once
-graph_samples = False     # generate plot (takes more time)
-angle_edge_calib = 40     # observed incident angle edge (to calibrate, update with incident angle with sound source at edge)
+graph_samples = True      # generate plot (takes more time)
+angle_edge_calib = 25 #40 # observed incident angle edge (to calibrate, update with incident angle with sound source at edge)
 angle_middle_calib = 90   # observed incident angle middle (should be 90)
 frame_length = frame_size / (sampling_rate * 1000)  # sec
 
@@ -42,7 +42,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
 # fields
 incident_angle = 90  # initial value
 lag_sample_delay_rolling_avg = []  # rolling avg array
-fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 8))  # plots for easy/fast redrawing
+fig, (ax1, ax2, ax3) = plt.subplots(3, figsize=(10, 10))  # plots for easy/fast redrawing
 
 # sampling loop
 first = True  # loop control
@@ -65,6 +65,11 @@ while first or repeat:  # run once or forever
     if filter_on:
         y_a = butter_bandpass_filter(y_a, filter_lowcut, filter_highcut, sampling_rate * 1000, order=filter_order)
         y_b = butter_bandpass_filter(y_b, filter_lowcut, filter_highcut, sampling_rate * 1000, order=filter_order)
+
+    # perform fft
+    yf_a = scipy.fftpack.fft(y_a)
+    yf_b = scipy.fftpack.fft(y_b)
+    xf = np.linspace(0, 1//(2*T), N//2)
 
     # correlate signals & calculate signal lag
     yc = scipy.signal.correlate(y_a - np.mean(y_a), y_b - np.mean(y_b), mode='full')
@@ -111,18 +116,24 @@ while first or repeat:  # run once or forever
 
     # graph signal alongside correlation if chosen
     if graph_samples:
-        # graph correlation
-        ax1.cla()
-        ax1.set_ylabel("Correlation")
-        ax1.set_xlabel("Delay/Lag")
-        ax1.plot(xc, yc)  # marker='o')
-        ax1.annotate('argmax={}@{}ms'.format(round(yc[lag_sample_delay], 3), lag_time_delay),  (lag_time_delay, yc[yc.argmax()]), ha='center')
         # graph signal
+        ax1.cla()
+        ax1.set_ylabel("Sample Value")
+        ax1.set_xlabel("Sample #")
+        ax1.plot(x, y_a, color='red')
+        ax1.plot(x, y_b, color='blue')
+        # graph correlation
         ax2.cla()
-        ax2.set_ylabel("Sample Value")
-        ax2.set_xlabel("Sample #")
-        ax2.plot(x, y_a, color='red')
-        ax2.plot(x, y_b, color='blue')
+        ax2.set_ylabel("Correlation")
+        ax2.set_xlabel("Delay/Lag")
+        ax2.plot(xc, yc)  # marker='o')
+        ax2.annotate('argmax={}@{}ms'.format(round(yc[lag_sample_delay], 3), lag_time_delay),  (lag_time_delay, yc[yc.argmax()]), ha='center')
+        # graph fft
+        ax3.cla()
+        ax3.set_ylabel("Amplitude")
+        ax3.set_xlabel("Frequency [Hz]")
+        ax3.plot(xf, 2/N * np.abs(yf_a[:N//2]))
+        ax3.plot(xf, 2/N * np.abs(yf_b[:N//2]))
 
         plt.pause(0.25) # live periodic update
 
