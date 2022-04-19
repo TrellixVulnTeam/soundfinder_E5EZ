@@ -33,8 +33,8 @@
 #include "../inc/LaunchPad.h"
 #include "../inc/UART.h"
 
-#define PWM_PERIOD 40000
-#define SERVO_NEUTRAL 12000
+#define PWM_PERIOD 32000
+#define SERVO_NEUTRAL 9600
 
 #define SERVO_ZERO 0
 #define SERVO_ONE  1
