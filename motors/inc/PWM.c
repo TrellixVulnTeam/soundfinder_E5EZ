@@ -52,8 +52,8 @@ void PWM0A_Init(uint16_t period, uint16_t duty){
   GPIO_PORTB_PCTL_R |= 0x04000000;
   GPIO_PORTB_AMSEL_R &= ~0x40;          // disable analog functionality on PB6
   GPIO_PORTB_DEN_R |= 0x40;             // enable digital I/O on PB6
-  SYSCTL_RCC_R = 0x00100000 |           // 3) use PWM divider
-      (SYSCTL_RCC_R & (~0x000E0000));   //    configure for /2 divider
+  SYSCTL_RCC_R &= ~SYSCTL_RCC_PWMDIV_M; //    clear PWM divider field
+  SYSCTL_RCC_R += SYSCTL_RCC_PWMDIV_8;  //    configure for /8 divider
   PWM0_0_CTL_R = 0;                     // 4) re-loading down-counting mode
   PWM0_0_GENA_R = 0xC8;                 // low on LOAD, high on CMPA down
   // PB6 goes low on LOAD
@@ -116,7 +116,7 @@ void PWM3B_Init(uint16_t period, uint16_t duty){
   GPIO_PORTA_DEN_R |= 0x80;             // enable digital I/O on PA7
   SYSCTL_RCC_R |= SYSCTL_RCC_USEPWMDIV; // 3) use PWM divider
   SYSCTL_RCC_R &= ~SYSCTL_RCC_PWMDIV_M; //    clear PWM divider field
-  SYSCTL_RCC_R += SYSCTL_RCC_PWMDIV_2;  //    configure for /2 divider
+  SYSCTL_RCC_R += SYSCTL_RCC_PWMDIV_8;  //    configure for /8 divider
   PWM1_1_CTL_R = 0;                     // 4) re-loading down-counting mode
   PWM1_1_GENB_R = (PWM_1_GENB_ACTCMPBD_ONE|PWM_1_GENB_ACTLOAD_ZERO);
   // PA7 goes low on LOAD

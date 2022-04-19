@@ -49,19 +49,17 @@ class Person:
 # Person if has been detected 90% of the time for > 3 seconds
 # Continues to be a person detected until
 # Not detected 90% of the time for 3 seconds
-# Distance: 3% variablity, aka 100 and 103 are same person
+# Distance: += 50 coordinates on both x and y
 # Given x, y, w, h
-# TESTING SINCE CLOSE: 20% variability
-smallPercent = .8
-largePercent = 1.2
+distance = 50 
 seconds = 3
 def addToArrays(x, y, w, h):
     # Check if coordinates are already in verifiedPeople array
-    smallX = smallPercent * x
-    largeX = largePercent * x
-    smallY = smallPercent * y
-    largeY = largePercent * y
     alreadyVerified = False
+    smallX = x - distance
+    largeX = x + distance
+    smallY = y - distance
+    largeY = y + distance
     for person in Person.verifiedArray: 
         if(smallX < person.x < largeX and smallY < person.y < largeY): 
             alreadyVerified = True
@@ -109,7 +107,7 @@ def updateArrays():
     for person in Person.verifiedArray: 
         if(time.time() - person.timeLastDetected >= 3 and person.percentDetected < .9): 
             Person.verifiedArray.remove(person)
-
+    
     # For all people, both in verified and potential
     # If not seenThisRound, then updateStats(-1) 
     # Set seenThisRound to False for ALL to reset
@@ -175,6 +173,7 @@ cap = cv.VideoCapture(0)
 if not cap.isOpened:
     print('--(!)Error opening video capture')
     exit(0)
+startTime = time.time()
 while True:
     ret, frame = cap.read()
     # resizing for faster detection
@@ -186,6 +185,13 @@ while True:
     # if cv.waitKey(10) == 27:
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
+    if(time.time() - startTime > 5):
+        print("5 SECONDS")
+        startTime = time.time()
+        for person in Person.potentialArray: 
+            print(person)
+        for person in Person.verifiedArray: 
+            print(person)
 for person in Person.potentialArray: 
     print(person)
 for person in Person.verifiedArray: 
