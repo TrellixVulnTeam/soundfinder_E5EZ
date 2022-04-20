@@ -4,7 +4,7 @@ import scipy.signal
 import scipy.fftpack
 import matplotlib.pyplot as plt
 
-from receiver import Receiver
+from audio.python_receiver.receiver import Receiver
 
 # SoundFinder class
 class SoundFinder:
@@ -161,7 +161,7 @@ class SoundFinder:
 
             self.fig.tight_layout()
             plt.pause(0.25) # live periodic update
-            plt.savefig("./graphs/correlation_output_{}.png".format(self.frame_counter))
+            #plt.savefig("./graphs/correlation_output_{}.png".format(self.frame_counter))
 
 
 
