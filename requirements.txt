@@ -1,5 +1,6 @@
 numpy
 scipy
+PyQt5
 pyserial
 matplotlib
-PyQt5
+opencv-python
