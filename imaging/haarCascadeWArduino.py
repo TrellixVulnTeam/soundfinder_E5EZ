@@ -3,7 +3,7 @@ import cv2 as cv
 import argparse
 import time
 from cv2 import sqrt
-from nbformat import write
+# rom nbformat import write
 import serial
 import math
 
@@ -198,32 +198,32 @@ def angle_calculation(x):
         angle = angle + 180
     return angle
 
-startTime = time.time()
-while True:
-    ret, frame = cap.read()
-    # resizing for faster detection
-    frame = cv.resize(frame, (framex, 480))
-    if frame is None:
-        print('--(!) No captured frame -- Break!')
-        break
-    detectAndDisplay(frame)
-    # if cv.waitKey(10) == 27:
-    if cv.waitKey(1) & 0xFF == ord('q'):
-        break
-    
-    if time.time() - startTime > 5:
-        startTime = time.time()
-        for person in Person.verifiedArray:
-            print(person)     
-        for person in Person.potentialArray: 
-            print(person)  
-for person in Person.verifiedArray:
-#         x = write_read(str(person.x))
-#         y = write_read(str(person.y))
-#         print("X: " + str(int(x)))
-#         print("Y: " + str(int(y)))
-    print(person)
-    print(angle_calculation(person.x))
-for person in Person.potentialArray: 
-    print(person)
-    
+if __name__ == "__main__":
+    startTime = time.time()
+    while True:
+        ret, frame = cap.read()
+        # resizing for faster detection
+        frame = cv.resize(frame, (framex, 480))
+        if frame is None:
+            print('--(!) No captured frame -- Break!')
+            break
+        detectAndDisplay(frame)
+        # if cv.waitKey(10) == 27:
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            break
+
+        if time.time() - startTime > 5:
+            startTime = time.time()
+            for person in Person.verifiedArray:
+                print(person)
+            for person in Person.potentialArray:
+                print(person)
+    for person in Person.verifiedArray:
+    #         x = write_read(str(person.x))
+    #         y = write_read(str(person.y))
+    #         print("X: " + str(int(x)))
+    #         print("Y: " + str(int(y)))
+        print(person)
+        print(angle_calculation(person.x))
+    for person in Person.potentialArray:
+        print(person)

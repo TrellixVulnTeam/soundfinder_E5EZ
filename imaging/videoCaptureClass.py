@@ -56,8 +56,8 @@ class VideoCapture:
 
     # Returns array of people
     def run(self): 
-        face_cascade = cv.CascadeClassifier('C:/Users/ckaro/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0/LocalCache/local-packages/Python310/site-packages/cv2/data/haarcascade_frontalface_alt.xml')
-        body_cascade = cv.CascadeClassifier('C:/Users/ckaro/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0/LocalCache/local-packages/Python310/site-packages/cv2/data/haarcascade_upperbody.xml')
+        face_cascade = cv.CascadeClassifier('venv/Lib/site-packages/cv2/data/haarcascade_frontalface_alt.xml')
+        body_cascade = cv.CascadeClassifier('venv/Lib/site-packages/cv2/data/haarcascade_upperbody.xml')
         #-- 2. Read the video stream
         cap = cv.VideoCapture(0)
         if not cap.isOpened:
