@@ -82,9 +82,9 @@ void SysTick_Handler(void) {
 int main(void){
 	int32_t angle = 0;
 	char incidentMic;
-  PLL_Init(Bus16MHz);
+  //PLL_Init(Bus16MHz);
 	
-	//PLL_Init(Bus80MHz);       // 80  MHz
+	PLL_Init(Bus80MHz);       // 80  MHz
 	
 	//NOTE: I don't know why this one needs a parameter to be passed whereas previous times it didn't. -Evelyn
 	UART_Init(1);              // initialize UART
