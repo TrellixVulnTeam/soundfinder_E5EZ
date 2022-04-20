@@ -1,3 +1,5 @@
+import time
+
 import serial
 
 from threading import Thread
@@ -14,10 +16,11 @@ class MotorController:
         self.source = source
         self.baud_rate = baud_rate
 
-        self.r = serial.Serial(self.source, self.baud_rate, timeout=1, write_timeout=1)
+        self.r = serial.Serial(self.source, self.baud_rate)
+        time.sleep(1)
 
-        # self.t1 = Thread(target=self.listen)
-        # self.t1.start()
+        self.t1 = Thread(target=self.listen)
+        self.t1.start()
 
     def move(self, angle: int):
         """
@@ -37,15 +40,20 @@ class MotorController:
         else:
             # out = f'{angle}'.encode('utf-8')
             # self.r.writelines(out)
+            self.r.write(b'A')
             self.r.write(angle)
             self.r.write(b'\n')
+
+    def test(self):
+        self.r.write(b"Poggers")
 
     def listen(self):
         while True:
             data = self.r.read(100)
+
             print(data)
 
 
 if __name__ == "__main__":
-    m = MotorController("COM3")
-    m.move(100)
+    m = MotorController("COM5")
+    m.test()
