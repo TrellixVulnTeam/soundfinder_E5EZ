@@ -113,20 +113,20 @@ class SoundFinder:
         try:  # try-catch needed for arccos domain errors (probably noisy outlier delay values whose source angle would be out of range/impossible)
             new_incident_angle = (180.0 / math.pi) * math.acos(self.speed_sound * (self.lag_time_delay) / (self.mic_distance / 1000))
         except:
-            new_incident_angle = incident_angle
-        incident_angle = new_incident_angle
+            new_incident_angle = self.incident_angle
+        self.incident_angle = new_incident_angle
 
         # fine-tune value with calibration incident angle edge (extrapolate range)
-        self.fine_tuned_incident_angle = incident_angle
+        self.fine_tuned_incident_angle = self.incident_angle
         if self.angle_edge_calib != 0:
-            angle_val = incident_angle
+            angle_val = self.incident_angle
             if angle_val < self.angle_edge_calib:
                 angle_val = self.angle_edge_calib
             self.fine_tuned_incident_angle = self.angle_middle_calib - (self.angle_middle_calib * ((self.angle_middle_calib - angle_val) / (self.angle_middle_calib - self.angle_edge_calib)))
 
         # output relevant data
         if self.log_output:
-            print("{} @ {}deg <-- {}deg <-- d={}ms,{}sam@c{}".format(self.incident_mic, round(self.fine_tuned_incident_angle, 3), round(incident_angle, 3), self.lag_time_delay, self.lag_sample_delay, round(yc[self.lag_sample_delay], 3)))
+            print("{} @ {}deg <-- {}deg <-- d={}ms,{}sam@c{}".format(self.incident_mic, round(self.fine_tuned_incident_angle, 3), round(self.incident_angle, 3), self.lag_time_delay, self.lag_sample_delay, round(yc[self.lag_sample_delay], 3)))
             # print("Sample Delay/Lag: {} samples".format(lag_sample_delay))
             # print("Time Delay/Lag: {} ms".format(lag_time_delay))
             # print("Correlation: {}".format(round(yc[lag_sample_delay], 3)))
