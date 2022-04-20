@@ -1,16 +1,13 @@
-from enum import Enum
-
 import serial
 
+from threading import Thread
 
-class Motor(Enum):
-    Pitch = 0   # Up and down
-    Yaw = 1     # Left and right
 
 class MotorController:
     r = None
     source = None
     baud_rate = None
+    t1 = None
 
     def __init__(self, source: str, baud_rate=115200):
         # Connect to microcontroller
@@ -19,12 +16,36 @@ class MotorController:
 
         self.r = serial.Serial(self.source, self.baud_rate, timeout=1, write_timeout=1)
 
-    def move_to_position(self, motor: Motor, angle: int):
+        # self.t1 = Thread(target=self.listen)
+        # self.t1.start()
+
+    def move(self, angle: int):
         """
         Moves motor to a specified position
-        Angle is in increments of tenths of degrees
-        For example, to move to 45 degrees, send 450
-        0 is center
+        Angle in increments of a tenth of a degree and can be between -900 and 900
+        :param angle:   The angle to move to in tenths of degree. So to move to 45, send 450
         """
 
-        self.r.write(f"{motor} {angle}\n")
+        if angle < -900 or angle > 900:
+            raise ValueError("Angle cannot be below -900 or above 900")
+
+        if angle < 0:
+            # out = f'B{abs(angle)}'.encode('utf-8')
+            self.r.write(b'B')
+            self.r.write(abs(angle))
+            self.r.write(b'\n')
+        else:
+            # out = f'{angle}'.encode('utf-8')
+            # self.r.writelines(out)
+            self.r.write(angle)
+            self.r.write(b'\n')
+
+    def listen(self):
+        while True:
+            data = self.r.read(100)
+            print(data)
+
+
+if __name__ == "__main__":
+    m = MotorController("COM3")
+    m.move(100)
