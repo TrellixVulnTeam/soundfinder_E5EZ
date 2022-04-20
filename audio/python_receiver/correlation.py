@@ -8,15 +8,15 @@ import matplotlib.pyplot as plt
 source_use_file = False   # use device or file
 source = "/dev/cu.SLAB_USBtoUART" if not source_use_file else "data/sample_gen_example1_32kHz_800Hz_0.0001ms.txt"
 sampling_rate = 32        # kHz  -  MUST MATCH ESP
-frame_size = 1024         # #samples  -  MUST MATCH ESP
-mic_distance = 75         # mm  -  MUST MATCH SETUP
+frame_size = 768          # #samples  -  MUST MATCH ESP
+mic_distance = 250        # mm  -  MUST MATCH SETUP
 speed_sound = 343         # 343 m/sec = speed of sound in air
-average_delays = 2        # rolling average on sample delay (set to 0 for none)
+average_delays = 5       # rolling average on sample delay (set to 0 for none)
 normalize_signal = True   # normalize before correlation
-filter_on = True         # butterworth bandpass filter
+filter_on = True          # butterworth bandpass filter
 filter_lowcut = 400.0     # Hz
 filter_highcut = 1400.0   # Hz
-filter_order = 12         # filter order
+filter_order = 10         # filter order
 repeat = True             # sample forever or only once
 graph_samples = True      # generate plot (takes more time)
 angle_edge_calib = 25  #25 # observed incident angle edge (to calibrate, update with incident angle with sound source at edge; 0 for no fine-tuning; usually between 15-45)
