@@ -2,8 +2,6 @@ from __future__ import print_function
 import cv2 as cv
 import argparse
 import time
-from nbformat import write
-import serial
 
 class Person: 
     verifiedCounter = 1
@@ -170,23 +168,13 @@ def detectAndDisplay(frame):
     cv.imshow('Capture - Face and body detection', frame)
 
 
-face_cascade = cv.CascadeClassifier(r'C:\Users\p13rc\where-is-sound\pyarduino\pyArd\Lib\site-packages\cv2\data\haarcascade_frontalface_alt.xml')
-body_cascade = cv.CascadeClassifier(r'C:\Users\p13rc\where-is-sound\pyarduino\pyArd\Lib\site-packages\cv2\data\haarcascade_upperbody.xml')
+face_cascade = cv.CascadeClassifier('venv\Lib\site-packages\cv2\data\haarcascade_frontalface_alt.xml')
+body_cascade = cv.CascadeClassifier('venv\Lib\site-packages\cv2\data\haarcascade_upperbody.xml')
 #-- 2. Read the video stream
 cap = cv.VideoCapture(0)
 if not cap.isOpened:
     print('--(!)Error opening video capture')
     exit(0)
-
-#-- Arduino stuff
-arduino = serial.Serial('com3', 115200)
-time.sleep(1)
-def write_read(x):
-    arduino.write(bytes(x, 'utf-8'))
-    time.sleep(0.05)
-    data = arduino.readline()
-    return data
-
 while True:
     ret, frame = cap.read()
     # resizing for faster detection
@@ -198,11 +186,8 @@ while True:
     # if cv.waitKey(10) == 27:
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
-    for person in Person.verifiedArray:
-        x = write_read(str(person.x))
-        y = write_read(str(person.y))
-        print("X: " + str(int(x)))
-        print("Y: " + str(int(y)))  
 for person in Person.potentialArray: 
+    print(person)
+for person in Person.verifiedArray: 
     print(person)
     

@@ -2,15 +2,16 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-from util import count_pairs_diff
+# from util import count_pairs_diff
 
-sampling_rate = 8       # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
-frame_size = 192        # #samples
+sampling_rate = 48      # kHz --> fake sampling rate of 2000 Hz or 8000 Hz
+# frame_size = 1024       # #samples
 speed_sound = 343       # 343 m/sec = speed of sound in air
-mic_distance = 260      # mm
+mic_distance = 250      # mm
+graph_relation = True
 angle_difference_sample_threshold = 1.0
 angle_difference_range_options = [2, 5, 10, 20]
-frame_length = frame_size / (sampling_rate * 1000)  # ms
+# frame_length = frame_size / (sampling_rate * 1000)  # ms
 
 theta = np.linspace(0, 90, 91)
 sample_delay = np.linspace(0, 90, 91)
@@ -47,16 +48,17 @@ for r in angle_differences:
         print("no differences over {} samples".format(angle_difference_sample_threshold))
     print("")
 
-fig, ax1 = plt.subplots()
-ax1.set_xlabel("Theta")
-ax1.set_ylabel("Sample Delay", color='red')
-ax1.plot(theta, sample_delay, color='red', marker='o')
-ax1.tick_params(axis='y', labelcolor='red')
-ax2 = ax1.twinx()
-ax2.set_ylabel("Time Delay", color='blue')
-ax2.plot(theta, time_delay, color='blue')
-ax2.tick_params(axis='y', labelcolor='blue')
-fig.tight_layout()
+if graph_relation:
+    fig, ax1 = plt.subplots()
+    ax1.set_xlabel("Theta")
+    ax1.set_ylabel("Sample Delay", color='red')
+    ax1.plot(theta, sample_delay, color='red', marker='o')
+    ax1.tick_params(axis='y', labelcolor='red')
+    ax2 = ax1.twinx()
+    ax2.set_ylabel("Time Delay", color='blue')
+    ax2.plot(theta, time_delay, color='blue')
+    ax2.tick_params(axis='y', labelcolor='blue')
+    fig.tight_layout()
 
-fig.savefig('angle_delay_relation_{}kHz_{}mm.png'.format(sampling_rate, mic_distance))
-plt.show()
+    fig.savefig('angle_delay_relation_{}kHz_{}mm.png'.format(sampling_rate, mic_distance))
+    plt.show()
