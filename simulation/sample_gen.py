@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 output_name = 'example1'
 # simulated mic settings
 speed_sound = 343       # 343 m/sec = speed of sound in air
-mic_distance = 260      # mm
+mic_distance = 250      # mm
 incident_angle = 80     # degrees
 mic_delay_a = 0         # ms
 mic_delay_b =  math.cos((math.pi / 180.0) * incident_angle) * (mic_distance / 1000) / speed_sound
