@@ -17,10 +17,10 @@ class MotorController:
         self.baud_rate = baud_rate
 
         self.r = serial.Serial(self.source, self.baud_rate)
-        time.sleep(1)
+        # time.sleep(1)
 
-        self.t1 = Thread(target=self.listen)
-        self.t1.start()
+        # self.t1 = Thread(target=self.listen)
+        # self.t1.start()
 
     def move(self, angle: int):
         """
@@ -33,19 +33,17 @@ class MotorController:
             raise ValueError("Angle cannot be below -900 or above 900")
 
         if angle < 0:
-            # out = f'B{abs(angle)}'.encode('utf-8')
             self.r.write(b'B')
-            self.r.write(abs(angle))
-            self.r.write(b'\n')
+            time.sleep(0.1)
+            self.r.write(f'{angle}\r'.encode('utf-8'))
         else:
-            # out = f'{angle}'.encode('utf-8')
-            # self.r.writelines(out)
             self.r.write(b'A')
-            self.r.write(angle)
-            self.r.write(b'\n')
+            time.sleep(0.1)
+            self.r.write(f'{angle}\r'.encode('utf-8'))
 
     def test(self):
-        self.r.write(b"Poggers")
+        self.r.write(b"Poggers\n")
+        print("Wrote poggers")
 
     def listen(self):
         while True:
@@ -55,5 +53,14 @@ class MotorController:
 
 
 if __name__ == "__main__":
-    m = MotorController("COM5")
-    m.test()
+    m = MotorController("COM3")
+
+    # m.move(100)
+
+    for i in range(-900, 900, 100):
+        m.move(i)
+        time.sleep(0.25)
+
+    for i in range(900, -900, 100):
+        m.move(i)
+        time.sleep(0.25)
