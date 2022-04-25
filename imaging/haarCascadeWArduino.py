@@ -172,8 +172,8 @@ def detectAndDisplay(frame):
     cv.imshow('Capture - Face and body detection', frame)
 
 
-face_cascade = cv.CascadeClassifier(r'C:\Users\p13rc\where-is-sound\pyarduino\pyArd\Lib\site-packages\cv2\data\haarcascade_frontalface_alt.xml')
-body_cascade = cv.CascadeClassifier(r'C:\Users\p13rc\where-is-sound\pyarduino\pyArd\Lib\site-packages\cv2\data\haarcascade_upperbody.xml')
+face_cascade = cv.CascadeClassifier(cv.data.haarcascades + 'haarcascade_frontalface_alt.xml')
+body_cascade = cv.CascadeClassifier(cv.data.haarcascades + 'haarcascade_upperbody.xml')
 #-- 2. Read the video stream
 cap = cv.VideoCapture(0)
 if not cap.isOpened:
@@ -194,8 +194,6 @@ def angle_calculation(x):
     num = math.sqrt(((framex/2)**2)-((framex/2-x)**2))
     denom = x-320
     angle = math.degrees(math.atan(num/denom))
-    if angle < 0:
-        angle = angle + 180
     return angle
 
 if __name__ == "__main__":
@@ -215,7 +213,7 @@ if __name__ == "__main__":
         if time.time() - startTime > 5:
             startTime = time.time()
             for person in Person.verifiedArray:
-                print(person)
+                print(f"{person} with angle {angle_calculation(person.x)}")
             for person in Person.potentialArray:
                 print(person)
     for person in Person.verifiedArray:

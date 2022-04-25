@@ -1,3 +1,4 @@
+from numpy import inf
 from audio.python_receiver.receiver import Receiver
 from audio.python_receiver.audio import SoundFinder 
 from imaging.videoCaptureClass import VideoCapture
@@ -29,7 +30,7 @@ def audioFunc(sf):
 if __name__ == "__main__":
 
      # sampling & correlation settings
-    source_use_file = False   # use device or file
+    source_use_file = True   # use device or file
     source = "COM4" if not source_use_file else r"audio\python_receiver\data\sample_gen_example1_32kHz_800Hz_0.0001ms.txt"
     sampling_rate = 32        # kHz  -  MUST MATCH ESP
     frame_size = 768         # #samples  -  MUST MATCH ESP
@@ -52,8 +53,6 @@ if __name__ == "__main__":
     m = MotorController("COM5")
     m.move(0)   # center the camera
 
-
-
     arr = Array('d', [-1,-1,-1])
     p1 = Process(target=imagingFunc, args=(arr,))
     #p2 = Process(target=audioFunc, args=(sf,))
@@ -65,6 +64,16 @@ if __name__ == "__main__":
     while True:
         angle = sf.next_angle()  # get next/current angle
         print(f"audio angle: {angle}")
+        bestDiff = inf
+        bestAngle = 90
         for person in arr:
+            if person == -1: continue
+            diff = abs(angle - person)
+            if diff < bestDiff:
+                bestDiff = diff
+                bestAngle = person
             print(person)
+        print(f"best angle is {bestAngle}")
+        m.move(bestAngle)
+
 
