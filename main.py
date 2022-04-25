@@ -3,6 +3,7 @@ from audio.python_receiver.audio import SoundFinder
 from imaging.videoCaptureClass import VideoCapture
 from imaging.haarCascadeWArduino import angle_calculation
 from multiprocessing import Process, Value, Array
+from motors.motor_controller import MotorController
 
 videoCapture = VideoCapture()
 def imagingFunc(array):
@@ -47,6 +48,10 @@ if __name__ == "__main__":
 
     r = Receiver(source, use_file=source_use_file)
     sf = SoundFinder(r, sampling_rate, frame_size, mic_distance, normalize_signal, [filter_lowcut, filter_highcut, filter_order], average_delays, [angle_middle_calib, angle_edge_calib], False, graph_samples)
+
+    m = MotorController("COM5")
+    m.move(0)   # center the camera
+
 
 
     arr = Array('d', [-1,-1,-1])
