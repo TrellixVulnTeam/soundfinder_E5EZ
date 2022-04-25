@@ -56,8 +56,8 @@ class VideoCapture:
 
     # Returns array of people
     def run(self): 
-        face_cascade = cv.CascadeClassifier('venv/Lib/site-packages/cv2/data/haarcascade_frontalface_alt.xml')
-        body_cascade = cv.CascadeClassifier('venv/Lib/site-packages/cv2/data/haarcascade_upperbody.xml')
+        face_cascade = cv.CascadeClassifier(cv.data.haarcascades + 'haarcascade_frontalface_alt.xml')
+        body_cascade = cv.CascadeClassifier(cv.data.haarcascades + 'haarcascade_upperbody.xml')
         #-- 2. Read the video stream
         cap = cv.VideoCapture(0)
         if not cap.isOpened:
@@ -189,7 +189,9 @@ class VideoCapture:
                 person.updateStats(-1)
             person.seenThisRound = False
             
-
-
-
-
+if __name__ == "__main__":
+    videoCapture = VideoCapture()
+    # Everytime it's called, takes 4 seconds to return a list of verified people
+    verifiedPeople = videoCapture.run()
+    for person in verifiedPeople:
+        print(person)
