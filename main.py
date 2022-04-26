@@ -48,7 +48,7 @@ if __name__ == "__main__":
     source_use_file = False   # use device or file
     source = audio_mcu if not source_use_file else r"audio\python_receiver\data\sample_gen_example1_32kHz_800Hz_0.0001ms.txt"
     sampling_rate = 32        # kHz  -  MUST MATCH ESP
-    frame_size = 768          # #samples  -  MUST MATCH ESP
+    frame_size = 1024         # #samples  -  MUST MATCH ESP
     mic_distance = 250        # mm  -  MUST MATCH SETUP
     average_delays = 2       # rolling average on sample delay (set to 0 for none)
     normalize_signal = True   # normalize before correlation
@@ -78,34 +78,38 @@ if __name__ == "__main__":
     #p1.join()
     #p2.join()
 
-    app = QApplication(sys.argv)
-    a = App()
-    a.show()
+    # app = QApplication(sys.argv)
+    # a = App()
+    # a.show()
 
     rolling_average_angles = []
+
+    maxDiff = 75
 
     while True:
         angle, mic = sf.next_angle()  # get next/current angle
         angle = sf.convert_angle(angle, mic)
-        print(f"audio angle: {angle}")
+        # print(f"audio angle: {angle}")
         bestDiff = inf
         bestAngle = 90
         for person in arr:
             if person == -1: continue
-            # print(angle)
+            # bestAngle = person
+            print(person)
             diff = abs(angle - person)
-            if diff < bestDiff:
+            if diff < bestDiff and diff < maxDiff:
                 bestDiff = diff
                 bestAngle = person
-            # print(person)
+            # print('angle={},diff={}'.format(angle,diff))
+            # # print(person)
         # bestAngle = angle
-        print('audio_angle={}'.format(angle))
-        print('imaging_angle={}'.format(bestAngle))
+        # print('audio_angle={}'.format(angle))
+        # print('imaging_angle={}'.format(bestAngle))
         bestAngle = int(round(bestAngle * 10, 0))
-        # bestAudioAngle = int(round(angle * 10, 0))
-        # bestAngle = (0.75 * bestAngle + 0.25 * bestAudioAngle)
+        bestAudioAngle = int(round(angle * 10, 0))
+        bestAngle = (0.9 * bestAngle + 0.1 * bestAudioAngle)
         rolling_average_angles.append(bestAngle)
-        if len(rolling_average_angles) >= 3:
+        if len(rolling_average_angles) > 2:
             rolling_average_angles = rolling_average_angles[1:]
         final_angle = np.mean(rolling_average_angles)
         print(rolling_average_angles)
@@ -115,5 +119,5 @@ if __name__ == "__main__":
         # time.sleep(2)
 
 
-    sys.exit(app.exec_())
+    # sys.exit(app.exec_())
 

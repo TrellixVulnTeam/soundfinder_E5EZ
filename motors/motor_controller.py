@@ -53,14 +53,14 @@ class MotorController:
 
 
 if __name__ == "__main__":
-    m = MotorController("COM3")
+    m = MotorController("/dev/cu.usbmodem0E22BD701")
 
-    # m.move(100)
+    m.move(-500)
 
-    for i in range(-900, 900, 100):
-        m.move(i)
-        time.sleep(0.25)
+    # for i in range(-900, 900, 100):
+    #     m.move(i)
+    #     time.sleep(0.25)
 
-    for i in range(900, -900, 100):
-        m.move(i)
-        time.sleep(0.25)
+    # for i in range(900, -900, 100):
+    #     m.move(i)
+    #     time.sleep(0.25)

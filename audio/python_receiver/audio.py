@@ -125,11 +125,11 @@ class SoundFinder:
 
         # fine-tune value with calibration incident angle edge (extrapolate range)
         self.fine_tuned_incident_angle = self.incident_angle
-        # if self.angle_edge_calib != 0:
-        #     angle_val = self.incident_angle
-        #     if angle_val < self.angle_edge_calib:
-        #         angle_val = self.angle_edge_calib
-        #     self.fine_tuned_incident_angle = self.angle_middle_calib - (self.angle_middle_calib * ((self.angle_middle_calib - angle_val) / (self.angle_middle_calib - self.angle_edge_calib)))
+        if self.angle_edge_calib != 0:
+            angle_val = self.incident_angle
+            if angle_val < self.angle_edge_calib:
+                angle_val = self.angle_edge_calib
+            self.fine_tuned_incident_angle = self.angle_middle_calib - (self.angle_middle_calib * ((self.angle_middle_calib - angle_val) / (self.angle_middle_calib - self.angle_edge_calib)))
 
         # output relevant data
         if self.log_output:

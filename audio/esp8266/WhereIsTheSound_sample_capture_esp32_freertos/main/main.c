@@ -14,7 +14,7 @@
 #include "freertos/task.h"
 #include "sdkconfig.h"
 
-#define FRAME_SIZE 768	  // # samples (1024)
+#define FRAME_SIZE 1024	  // # samples (1024)
 #define SAMPLING_RATE 32  // kHz (32)
 
 volatile uint16_t ch_1_samples[FRAME_SIZE];
@@ -27,7 +27,7 @@ volatile bool ch_2_send = 0;
 
 /* ESP-IDF ADC DMA Initialization */
 
-#define TIMES 1024
+#define TIMES 256
 #define GET_UNIT(x) ((x >> 3) & 0x1)
 
 #if CONFIG_IDF_TARGET_ESP32
