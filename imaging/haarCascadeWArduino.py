@@ -194,7 +194,8 @@ def angle_calculation(x):
     num = math.sqrt(((framex/2)**2)-((framex/2-x)**2))
     denom = x-320
     angle = math.degrees(math.atan(num/denom))
-    return angle
+    # return angle
+    return angle * -1
 
 if __name__ == "__main__":
     startTime = time.time()
@@ -210,7 +211,7 @@ if __name__ == "__main__":
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
 
-        if time.time() - startTime > 5:
+        if time.time() - startTime >= 3:
             startTime = time.time()
             for person in Person.verifiedArray:
                 print(f"{person} with angle {angle_calculation(person.x)}")
