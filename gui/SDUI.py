@@ -16,7 +16,7 @@ class VideoThread(QThread):
 
     def run(self):
         # capture from web cam
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(1)
         while self._run_flag:
             ret, cv_img = cap.read()
             if ret:
@@ -33,7 +33,7 @@ class VideoThread(QThread):
 class App(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Qt live label demo")
+        self.setWindowTitle("Where Is The Sound")
         self.disply_width = 640
         self.display_height = 480
         # create the label that holds the image

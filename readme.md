@@ -4,6 +4,10 @@ Tasks located in Projects tab - https://github.com/BrandonZupan/where-is-sound/p
 
 ## Notes
 
+-   Naming:
+
+    -   Facing audience, left mic is Mic 1/A, right mic is Mic 2/B
+
 -   Best measured mic distances:
 
     -   1m has worked for other people (16kHz-->2deg)

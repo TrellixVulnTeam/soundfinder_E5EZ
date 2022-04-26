@@ -27,7 +27,7 @@ volatile bool ch_2_send = 0;
 
 /* ESP-IDF ADC DMA Initialization */
 
-#define TIMES 256
+#define TIMES 1024
 #define GET_UNIT(x) ((x >> 3) & 0x1)
 
 #if CONFIG_IDF_TARGET_ESP32

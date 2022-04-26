@@ -46,20 +46,21 @@ class Person:
 
 class VideoCapture:
 
-    def __init__(self): 
+    def __init__(self, cam_number = 0): 
         # distance = distance to qualify as same person
         # time = seconds where a face has to be > certain percent to qualify 
         # percent = percent of time a face has to be detected to qualify 
         self.distance = 50
         self.time = 3
         self.percent = .9
+        self.cam_number = cam_number
 
     # Returns array of people
     def run(self): 
         face_cascade = cv.CascadeClassifier(cv.data.haarcascades + 'haarcascade_frontalface_alt.xml')
         body_cascade = cv.CascadeClassifier(cv.data.haarcascades + 'haarcascade_upperbody.xml')
         #-- 2. Read the video stream
-        cap = cv.VideoCapture(0)
+        cap = cv.VideoCapture(self.cam_number)
         if not cap.isOpened:
             print('--(!)Error opening video capture')
             exit(0)
