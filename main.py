@@ -102,10 +102,10 @@ if __name__ == "__main__":
         print('audio_angle={}'.format(angle))
         print('imaging_angle={}'.format(bestAngle))
         bestAngle = int(round(bestAngle * 10, 0))
-        bestAudioAngle = int(round(angle * 10, 0))
-        bestAngle = (0.75 * bestAngle + 0.25 * bestAudioAngle)
+        # bestAudioAngle = int(round(angle * 10, 0))
+        # bestAngle = (0.75 * bestAngle + 0.25 * bestAudioAngle)
         rolling_average_angles.append(bestAngle)
-        if len(rolling_average_angles) >= 5:
+        if len(rolling_average_angles) >= 3:
             rolling_average_angles = rolling_average_angles[1:]
         final_angle = np.mean(rolling_average_angles)
         print(rolling_average_angles)
