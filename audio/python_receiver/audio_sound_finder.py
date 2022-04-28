@@ -27,7 +27,9 @@ class SoundFinder:
         self.filter_highcut = filter_bounds[1] if filter_bounds else 2000.0     # Hz                                  (ideal = 1200-1400)
         self.filter_order = filter_bounds[2] if filter_bounds else 1            # filter order                        (ideal = 4 for filtfilt, 8 for sosfiltfilt)
         self.filter_ratio = filter_bounds[3] if filter_bounds else 20           # %                                   (ideal = 20-25)
-        self.filter_bands = filter_bounds[4] if filter_bounds else []
+        self.filter_bands = filter_bounds[4] if filter_bounds and filter_bounds[4] else []
+        self.filter_bands_avg_ratio = filter_bounds[6] if filter_bounds else 10
+        self.filter_bands_order = filter_bounds[7] if filter_bounds else self.filter_order
         self.average_delays = average_delays                                    # rolling average on sample delay (0 for none) (ideal = 3 --> for more stability in values as well as smoother range)
         self.graph_samples = graph_samples                                      # generate plot (takes more time)
         self.graph_filtered = filter_bounds[5] if filter_bounds else False
@@ -42,14 +44,18 @@ class SoundFinder:
         self.incident_angle = 90                        # initial value
         self.lag_sample_delay_rolling_avg = []          # rolling avg array
         self.log_output = log_output
-        self.time_delay_filter_update_thres = 0.0003125 # sec --> 0.0003125sec converts to 5 samples with 16kHz & 1024
+        self.time_delay_filter_update_thres = 0.0006250  # sec --> 0.0003125sec converts to 5 samples with 16kHz & 1024
         self.sample_delay_filter_update_thres = self.time_delay_filter_update_thres * self.frame_size / self.frame_length
         # output values
         self.data = None                                # current/last signal data frame
-        self.lag_sample_delay = 0
         self.lag_time_delay = 0
+        self.lag_sample_delay = 0
         self.lag_sample_delay_filt = 0
         self.lag_sample_delay_raw = 0
+        self.lag_sample_delay_bands = [0 for i in range(len(self.filter_bands))]
+        self.lag_time_delay_bands = [0 for i in range(len(self.filter_bands))]
+        self.freq_band_incident_angles = [90 for i in range(len(self.filter_bands))]
+        self.freq_band_incident_mics = ['both' for i in range(len(self.filter_bands))]
         # self.lag_time_delay_filt = 0
         self.incident_mic = None
         self.incident_angle = 0
@@ -115,11 +121,6 @@ class SoundFinder:
             y_a_filt = self.butter_bandpass_filter(y_a, self.filter_lowcut, self.filter_highcut, self.sampling_rate * 1000, order=self.filter_order)
             y_b_filt = self.butter_bandpass_filter(y_b, self.filter_lowcut, self.filter_highcut, self.sampling_rate * 1000, order=self.filter_order)
 
-        # experiment with multiple filters
-        y_a_bands = []
-        y_b_bands = []
-        # for 
-
         # perform fft
         yf_a = scipy.fftpack.fft(y_a_filt if self.filter_on else y_a)
         yf_b = scipy.fftpack.fft(y_b_filt if self.filter_on else y_b)
@@ -129,11 +130,14 @@ class SoundFinder:
         yc = scipy.signal.correlate(y_a - np.mean(y_a), y_b - np.mean(y_b), mode='full')
         # extract sample delay from correlation graph
         self.lag_sample_delay_raw = yc.argmax() - (len(y_a) - 1)
+        # compare to filtered correlation to confirm angle change
+        filter_angle_update = not self.filter_on
         if self.filter_on:
             yc_filt = scipy.signal.correlate(y_a_filt - np.mean(y_a_filt), y_b_filt - np.mean(y_b_filt), mode='full')
             self.lag_sample_delay_filt = yc_filt.argmax() - (len(y_a_filt) - 1)
             if abs(self.lag_sample_delay_raw - self.lag_sample_delay_filt) <= self.sample_delay_filter_update_thres:
                 self.lag_sample_delay = round(((self.filter_ratio / 100) * self.lag_sample_delay_filt) + ((1 - (self.filter_ratio / 100)) * self.lag_sample_delay_raw))
+                filter_angle_update = True
             #     print('UPDATE')
             # print(self.lag_sample_delay_raw)
             # print(self.lag_sample_delay_filt)
@@ -154,15 +158,61 @@ class SoundFinder:
         xc = np.linspace((-1 * (len(yc) / 2) - 1), (len(yc) / 2) - 1, len(yc))  # in samples
         xc = xc * self.frame_length / self.frame_size    # in sec
 
-        # determine which mic the sound hit first
-        self.incident_mic = 'both' if self.lag_sample_delay == 0 else ('mic_A' if self.lag_sample_delay < 0 else 'mic_B')
         # calculate sound source angle of arrival using time delay, speed of sound, and mic distance
-        new_incident_angle = 0
+        new_incident_angle = 90
         try:  # try-catch needed for arccos domain errors (probably noisy outlier delay values whose source angle would be out of range/impossible)
             new_incident_angle = (180.0 / math.pi) * math.acos(self.speed_sound * (self.lag_time_delay) / (self.mic_distance / 1000))
         except:
             new_incident_angle = self.incident_angle
         self.incident_angle = new_incident_angle
+        # determine which mic the sound hit first
+        self.incident_mic = 'both' if self.lag_sample_delay == 0 or new_incident_angle == 90 else ('mic_A' if self.lag_sample_delay < 0 else 'mic_B')
+
+
+        # experiment with multiple filters
+        if self.filter_bands != None and len(self.filter_bands) > 0:
+            y_a_bands = [None for i in range(len(self.filter_bands))]
+            y_b_bands = [None for i in range(len(self.filter_bands))]
+            for b in range(len(self.filter_bands)):
+                f_lc = self.filter_bands[b][0]
+                f_hc = self.filter_bands[b][1]
+                f_o = self.filter_bands_order
+                y_a_bands[b] = self.butter_bandpass_filter(y_a, f_lc, f_hc, self.sampling_rate * 1000, order=f_o)
+                y_b_bands[b] = self.butter_bandpass_filter(y_b, f_lc, f_hc, self.sampling_rate * 1000, order=f_o)
+                yc_band_b = scipy.signal.correlate(y_a_bands[b] - np.mean(y_a_bands[b]), y_b_bands[b] - np.mean(y_b_bands[b]), mode='full')
+                self.lag_sample_delay_bands[b] = yc_band_b.argmax() - (len(y_a_bands[b]) - 1)
+                self.lag_time_delay_bands[b] = abs(self.lag_sample_delay_bands[b]) * self.frame_length / self.frame_size
+                new_incident_angle_band_b = 90
+                try:
+                    new_incident_angle_band_b = (180.0 / math.pi) * math.acos(self.speed_sound * (self.lag_time_delay_bands[b]) / (self.mic_distance / 1000))
+                except:
+                    new_incident_angle_band_b = self.freq_band_incident_angles[b]
+                self.freq_band_incident_angles[b] = new_incident_angle_band_b
+                self.freq_band_incident_mics[b] = 'both' if self.lag_sample_delay_bands[b] == 0 or new_incident_angle_band_b == 90 else ('mic_A' if self.lag_sample_delay_bands[b] < 0 else 'mic_B')
+            band_avg_angle = np.mean(self.freq_band_incident_angles)
+            both_c = 0
+            mic_a_c = 0
+            mic_b_c = 0
+            avg_incident_mic = 'both'
+            for mic in self.freq_band_incident_mics:
+                if mic == 'both':
+                    both_c += 1
+                elif mic == 'mic_A':
+                    mic_a_c += 1
+                elif mic == 'mic_B':
+                    mic_b_c += 1
+            if both_c > mic_a_c and both_c > mic_b_c:
+                avg_incident_mic = 'both'
+            elif mic_a_c > both_c and mic_a_c > mic_b_c:
+                avg_incident_mic = 'mic_A'
+            elif mic_b_c > both_c and mic_b_c > mic_a_c:   
+                avg_incident_mic = 'mic_B'
+            # only fine-tune the angle if the filter bands avg incident mic is the same as the unfiltered incident mic AND the filtered correlation agrees with the unfiltered correlation
+            if ((not self.filter_on) or filter_angle_update) and avg_incident_mic == self.incident_mic:
+            # if avg_incident_mic == self.incident_mic:
+                # old_incident_angle = self.incident_angle
+                self.incident_angle = ((1 - (filter_bands_avg_ratio / 100)) * self.incident_angle) + ((filter_bands_avg_ratio / 100) * band_avg_angle)
+                # print('{} --> {} :({})'.format(round(old_incident_angle, 2), round(self.incident_angle, 2), round(band_avg_angle, 2)))
 
         # fine-tune value with calibration incident angle edge (extrapolate range)
         self.fine_tuned_incident_angle = self.incident_angle
@@ -174,7 +224,8 @@ class SoundFinder:
 
         # output relevant data
         if self.log_output:
-            print("{} @ {}deg <-- {}deg <-- d={}ms,{}sam@c{}".format(self.incident_mic, round(self.fine_tuned_incident_angle, 3), round(self.incident_angle, 3), self.lag_time_delay, self.lag_sample_delay, round(yc[self.lag_sample_delay], 3)))
+            if filter_angle_update:
+                print("{} @ {}deg <-- {}deg <-- d={}ms,{}sam@c{}".format(self.incident_mic, round(self.fine_tuned_incident_angle, 3), round(self.incident_angle, 3), self.lag_time_delay, self.lag_sample_delay, round(yc[self.lag_sample_delay], 3)))
             # print("Sample Delay/Lag: {} samples".format(lag_sample_delay))
             # print("Time Delay/Lag: {} ms".format(lag_time_delay))
             # print("Correlation: {}".format(round(yc[lag_sample_delay], 3)))
@@ -192,6 +243,8 @@ class SoundFinder:
             self.ax1.set_xlabel("Sample #")
             self.ax1.plot(x, y_a_filt if self.filter_on and self.graph_filtered else y_a, color='red')
             self.ax1.plot(x, y_b_filt if self.filter_on and self.graph_filtered else y_b, color='blue')
+            # self.ax1.plot(x, y_a_bands[1], color='red')
+            # self.ax1.plot(x, y_b_bands[1], color='blue')
             # graph correlation
             self.ax2.cla()
             self.ax2.set_title("Correlation: {} @ {}°".format('left' if self.incident_mic == self.left_mic else 'right', round(self.fine_tuned_incident_angle, 3)))
@@ -230,21 +283,24 @@ if __name__ == "__main__":
     filter_lowcut = 500.0     # Hz                                  (ideal = 400-500)
     filter_highcut = 1200.0   # Hz                                  (ideal = 1200-1400)
     filter_order = 4          # filter order                        (ideal = 4 for filtfilt, 8 for sosfiltfilt)
-    filter_ratio = 25         # %                                   (ideal = 20-25)
-    filter_bands = [[400,500],[500,600],[600,700],[700,800],[800,900],[900,1000]]
+    filter_ratio = 30         # %                                   (ideal = 20-30)
+    filter_bands_order = 6
+    # filter_bands = None
+    filter_bands = [ [550,750], [650,850], [400,500], [500,600], [600,700], [700,800], [800,900], [900,1000] ]
+    filter_bands_avg_ratio = 10 # %                                 (ideal = 15-20)
     filter_graph = False      # display filtered or unfiltered signal frame on graph
     repeat = True             # sample forever or only once
     graph_samples = True      # generate plot (takes more time)
     angle_edge_calib = 25     # observed incident angle edge (to calibrate, update with incident angle with sound source at edge; 0 for no fine-tuning; usually between 15-45) (ideal = 25)
     angle_middle_calib = 90   # observed incident angle middle (should be 90)
-    log_output = False        # log the output
+    log_output = False         # log the output
     left_mic = 'mic_A'        # which mic is on the left  (usually = 'mic_A')
     frame_length = frame_size / (sampling_rate * 1000)  # sec
 
     # ESP32 serial dataframe receiver
     r = Receiver(source, use_file=source_use_file)
     # sound finding algorithm
-    sf = SoundFinder(r, sampling_rate, frame_size, mic_distance, normalize_signal, [filter_lowcut, filter_highcut, filter_order, filter_ratio, filter_bands, filter_graph] if filter_on else None, average_delays, left_mic, [angle_middle_calib, angle_edge_calib], log_output, graph_samples)
+    sf = SoundFinder(r, sampling_rate, frame_size, mic_distance, normalize_signal, [filter_lowcut, filter_highcut, filter_order, filter_ratio, filter_bands, filter_graph, filter_bands_avg_ratio, filter_bands_order] if filter_on else None, average_delays, left_mic, [angle_middle_calib, angle_edge_calib], log_output, graph_samples)
 
     # sampling loop
     first = True  # loop control
