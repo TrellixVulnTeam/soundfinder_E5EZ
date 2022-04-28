@@ -18,31 +18,39 @@ class SoundFinder:
     def __init__(self, receiver: Receiver, sampling_rate = 32, frame_size = 1024, mic_distance = 250, normalize_sig = True, filter_bounds = None, average_delays = 0, left_mic = 'mic_A', angle_calibration = [90, 10], log_output = False, graph_samples = False, graph_size = (8, 7)):
         # print(sampling_rate, frame_size, mic_distance, normalize_sig, filter_bounds, average_delays, angle_calibration, log_output, graph_samples , graph_size)
         # sampling & correlation settings
-        self.sampling_rate = sampling_rate      # kHz  -  MUST MATCH ESP/TM4C
-        self.frame_size = frame_size            # #samples  -  MUST MATCH ESP/TM4C
-        self.frame_length = frame_size / (sampling_rate * 1000)  # sec
-        self.mic_distance = mic_distance        # mm  -  MUST MATCH SETUP
-        self.filter_on = not(filter_bounds == None or filter_bounds == False)   # butterworth bandpass filter
-        self.filter_lowcut = filter_bounds[0] if filter_bounds else 0.0    # Hz
-        self.filter_highcut = filter_bounds[1] if filter_bounds else 2000.0 # Hz
-        self.filter_order = filter_bounds[2] if filter_bounds else 1       # filter order
-        self.average_delays = average_delays    # rolling average on sample delay (set to 0 for none)
-        self.graph_samples = graph_samples      # generate plot (takes more time)
-        self.angle_edge_calib = angle_calibration[1]              #25 # observed incident angle edge (to calibrate, update with incident angle with sound source at edge; 0 for no fine-tuning; usually between 15-45)
-        self.angle_middle_calib = angle_calibration[0]            # observed incident angle middle (should be 90)
-        self.normalize_signal = normalize_sig   # normalize before correlation
+        self.sampling_rate = sampling_rate                                      # kHz  -  MUST MATCH ESP              (ideal = 16 or 32)
+        self.frame_size = frame_size                                            # #samples  -  MUST MATCH ESP         (ideal = 512 or 1024)
+        self.frame_length = frame_size / (sampling_rate * 1000)                 # sec
+        self.mic_distance = mic_distance                                        # mm  -  MUST MATCH SETUP             (ideal = 75mm, 250mm, 500mm, 1000mm)
+        self.filter_on = not(filter_bounds == None or filter_bounds == False)   # butterworth bandpass filter         (ideal = True)
+        self.filter_lowcut = filter_bounds[0] if filter_bounds else 0.0         # Hz                                  (ideal = 400-500)
+        self.filter_highcut = filter_bounds[1] if filter_bounds else 2000.0     # Hz                                  (ideal = 1200-1400)
+        self.filter_order = filter_bounds[2] if filter_bounds else 1            # filter order                        (ideal = 4 for filtfilt, 8 for sosfiltfilt)
+        self.filter_ratio = filter_bounds[3] if filter_bounds else 20           # %                                   (ideal = 20-25)
+        self.filter_bands = filter_bounds[4] if filter_bounds else []
+        self.average_delays = average_delays                                    # rolling average on sample delay (0 for none) (ideal = 3 --> for more stability in values as well as smoother range)
+        self.graph_samples = graph_samples                                      # generate plot (takes more time)
+        self.graph_filtered = filter_bounds[5] if filter_bounds else False
+        self.angle_edge_calib = angle_calibration[1]                            # observed incident angle edge (to calibrate, update with incident angle with sound source at edge; 0 for no fine-tuning; usually between 15-45) (ideal = 25)
+        self.angle_middle_calib = angle_calibration[0]                          # observed incident angle middle (should be 90)
+        self.normalize_signal = normalize_sig                                   # normalize before correlation        (ideal = True)
         self.left_mic = left_mic
         # instance fields
-        self.r = receiver                       # serial dataframe receiver (import from receiver.py)
-        self.speed_sound = 343                  # 343 m/sec = speed of sound in air
-        self.frame_counter = 0                  # frame counter
-        self.incident_angle = 90                # initial value
-        self.lag_sample_delay_rolling_avg = []  # rolling avg array
+        self.r = receiver                               # serial dataframe receiver (import from receiver.py)
+        self.speed_sound = 343                          # 343 m/sec = speed of sound in air
+        self.frame_counter = 0                          # frame counter
+        self.incident_angle = 90                        # initial value
+        self.lag_sample_delay_rolling_avg = []          # rolling avg array
         self.log_output = log_output
+        self.time_delay_filter_update_thres = 0.0003125 # sec --> 0.0003125sec converts to 5 samples with 16kHz & 1024
+        self.sample_delay_filter_update_thres = self.time_delay_filter_update_thres * self.frame_size / self.frame_length
         # output values
-        self.data = None                        # current/last signal data frame
+        self.data = None                                # current/last signal data frame
         self.lag_sample_delay = 0
         self.lag_time_delay = 0
+        self.lag_sample_delay_filt = 0
+        self.lag_sample_delay_raw = 0
+        # self.lag_time_delay_filt = 0
         self.incident_mic = None
         self.incident_angle = 0
         self.fine_tuned_incident_angle = self.incident_angle
@@ -56,20 +64,33 @@ class SoundFinder:
             self.ax2 = ax2
             self.ax3 = ax3
 
+    # utility method to switch from TDOA incident angle coordinate system to camera's coordinate system
+    def convert_angle(self, angle, mic):
+        angle_invert = 90 - angle
+        if not (mic == self.left_mic):
+            angle_invert *= -1
+        return angle_invert
+
+    # filter utility functions
+    def butter_bandpass(self, lowcut, highcut, fs, order=5):
+        nyq = 0.5 * fs
+        low = lowcut / nyq
+        high = highcut / nyq
+        # sos = scipy.signal.butter(order, [low, high], analog=False, btype='band', output='sos')
+        # return sos
+        b, a = scipy.signal.butter(order, [low, high], analog=False, btype='band')
+        return (b, a)
+    def butter_bandpass_filter(self, data, lowcut, highcut, fs, order=5):
+        # sos = self.butter_bandpass(lowcut, highcut, fs, order=order)
+        # y = scipy.signal.sosfiltfilt(sos, data)
+        # y = scipy.signal.sosfilt(sos, data)
+        b, a = self.butter_bandpass(lowcut, highcut, fs, order=order)
+        y = scipy.signal.filtfilt(b, a, data)
+        # y = scipy.signal.lfilt(b, a, data)
+        return y
+
     # get next/current angle and incident mic
     def next_angle(self):
-
-            # filter utility functions
-        def butter_bandpass(lowcut, highcut, fs, order=5):
-            nyq = 0.5 * fs
-            low = lowcut / nyq
-            high = highcut / nyq
-            sos = scipy.signal.butter(order, [low, high], analog=False, btype='band', output='sos')
-            return sos
-        def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
-            sos = butter_bandpass(lowcut, highcut, fs, order=order)
-            y = scipy.signal.sosfilt(sos, data)
-            return y
 
         # receive 1 data frame
         self.data = self.r.receive(self.frame_size)
@@ -88,25 +109,45 @@ class SoundFinder:
             y_a = (y_a - np.mean(y_a)) / np.std(y_a)
             y_b = (y_b - np.mean(y_b)) / np.std(y_b)
         # filter signal data if chosen
+        y_a_filt = None
+        y_b_filt = None
         if self.filter_on:
-            y_a = butter_bandpass_filter(y_a, self.filter_lowcut, self.filter_highcut, self.sampling_rate * 1000, order=self.filter_order)
-            y_b = butter_bandpass_filter(y_b, self.filter_lowcut, self.filter_highcut, self.sampling_rate * 1000, order=self.filter_order)
+            y_a_filt = self.butter_bandpass_filter(y_a, self.filter_lowcut, self.filter_highcut, self.sampling_rate * 1000, order=self.filter_order)
+            y_b_filt = self.butter_bandpass_filter(y_b, self.filter_lowcut, self.filter_highcut, self.sampling_rate * 1000, order=self.filter_order)
+
+        # experiment with multiple filters
+        y_a_bands = []
+        y_b_bands = []
+        # for 
 
         # perform fft
-        yf_a = scipy.fftpack.fft(y_a)
-        yf_b = scipy.fftpack.fft(y_b)
+        yf_a = scipy.fftpack.fft(y_a_filt if self.filter_on else y_a)
+        yf_b = scipy.fftpack.fft(y_b_filt if self.filter_on else y_b)
         xf = np.linspace(0, 1//(2*T), N//2)
 
         # correlate signals & calculate signal lag
         yc = scipy.signal.correlate(y_a - np.mean(y_a), y_b - np.mean(y_b), mode='full')
         # extract sample delay from correlation graph
-        self.lag_sample_delay = yc.argmax() - (len(y_a) - 1)
+        self.lag_sample_delay_raw = yc.argmax() - (len(y_a) - 1)
+        if self.filter_on:
+            yc_filt = scipy.signal.correlate(y_a_filt - np.mean(y_a_filt), y_b_filt - np.mean(y_b_filt), mode='full')
+            self.lag_sample_delay_filt = yc_filt.argmax() - (len(y_a_filt) - 1)
+            if abs(self.lag_sample_delay_raw - self.lag_sample_delay_filt) <= self.sample_delay_filter_update_thres:
+                self.lag_sample_delay = round(((self.filter_ratio / 100) * self.lag_sample_delay_filt) + ((1 - (self.filter_ratio / 100)) * self.lag_sample_delay_raw))
+            #     print('UPDATE')
+            # print(self.lag_sample_delay_raw)
+            # print(self.lag_sample_delay_filt)
+            # print('')
+        else:
+            self.lag_sample_delay = self.lag_sample_delay_raw
+
         # rolling average on sample delays if chosen (smooths out outliers/noise)
         if self.average_delays > 0:
             self.lag_sample_delay_rolling_avg.append(self.lag_sample_delay)
             if len(self.lag_sample_delay_rolling_avg) > self.average_delays:
                 self.lag_sample_delay_rolling_avg = self.lag_sample_delay_rolling_avg[1:]
             self.lag_sample_delay = math.ceil(np.mean(self.lag_sample_delay_rolling_avg))
+
         # calculate time delay from sample delay
         self.lag_time_delay = abs(self.lag_sample_delay) * self.frame_length / self.frame_size
         # generate x-axis (in either sample or time delay) to make sense of correlation graph
@@ -149,11 +190,11 @@ class SoundFinder:
             self.ax1.set_title("Signal Frame")
             self.ax1.set_ylabel("Sample Value")
             self.ax1.set_xlabel("Sample #")
-            self.ax1.plot(x, y_a, color='red')
-            self.ax1.plot(x, y_b, color='blue')
+            self.ax1.plot(x, y_a_filt if self.filter_on and self.graph_filtered else y_a, color='red')
+            self.ax1.plot(x, y_b_filt if self.filter_on and self.graph_filtered else y_b, color='blue')
             # graph correlation
             self.ax2.cla()
-            self.ax2.set_title("Correlation: {} @ {}°".format(self.incident_mic, round(self.fine_tuned_incident_angle, 3)))
+            self.ax2.set_title("Correlation: {} @ {}°".format('left' if self.incident_mic == self.left_mic else 'right', round(self.fine_tuned_incident_angle, 3)))
             self.ax2.set_ylabel("Correlation")
             self.ax2.set_xlabel("Delay/Lag")
             self.ax2.plot(xc, yc)  # marker='o')
@@ -172,12 +213,6 @@ class SoundFinder:
 
         return (self.fine_tuned_incident_angle, self.incident_mic)
 
-    def convert_angle(self, angle, mic):
-        angle_invert = 90 - angle
-        if not (mic == self.left_mic):
-            angle_invert *= -1
-        return angle_invert
-
 
 
 # entry point
@@ -186,25 +221,30 @@ if __name__ == "__main__":
     # sampling & correlation settings
     source_use_file = False   # use device or file
     source = "/dev/cu.SLAB_USBtoUART" if not source_use_file else "data/sample_gen_example1_32kHz_800Hz_0.0001ms.txt"
-    sampling_rate = 32        # kHz  -  MUST MATCH ESP
-    frame_size = 768          # #samples  -  MUST MATCH ESP
-    mic_distance = 250        # mm  -  MUST MATCH SETUP
-    average_delays = 5        # rolling average on sample delay (set to 0 for none)
-    normalize_signal = True   # normalize before correlation
-    filter_on = True          # butterworth bandpass filter
-    filter_lowcut = 500.0     # Hz
-    filter_highcut = 1300.0   # Hz
-    filter_order = 12         # filter order
+    sampling_rate = 16        # kHz  -  MUST MATCH ESP              (ideal = 16 or 32)
+    frame_size = 512          # #samples  -  MUST MATCH ESP         (ideal = 512 or 1024)
+    mic_distance = 250        # mm  -  MUST MATCH SETUP             (ideal = 75mm, 250mm, 500mm, 1000mm)
+    average_delays = 3        # rolling average on sample delay (0 for none) (ideal = 3 --> for more stability in values as well as smoother range)
+    normalize_signal = True   # normalize before correlation        (ideal = True)
+    filter_on = True          # butterworth bandpass filter         (ideal = True)
+    filter_lowcut = 500.0     # Hz                                  (ideal = 400-500)
+    filter_highcut = 1200.0   # Hz                                  (ideal = 1200-1400)
+    filter_order = 4          # filter order                        (ideal = 4 for filtfilt, 8 for sosfiltfilt)
+    filter_ratio = 25         # %                                   (ideal = 20-25)
+    filter_bands = [[400,500],[500,600],[600,700],[700,800],[800,900],[900,1000]]
+    filter_graph = False      # display filtered or unfiltered signal frame on graph
     repeat = True             # sample forever or only once
     graph_samples = True      # generate plot (takes more time)
-    angle_edge_calib = 25  #25 # observed incident angle edge (to calibrate, update with incident angle with sound source at edge; 0 for no fine-tuning; usually between 15-45)
+    angle_edge_calib = 25     # observed incident angle edge (to calibrate, update with incident angle with sound source at edge; 0 for no fine-tuning; usually between 15-45) (ideal = 25)
     angle_middle_calib = 90   # observed incident angle middle (should be 90)
-    log_output = True         # log the output
-    left_mic = 'mic_A'        # which mic is on the left
+    log_output = False        # log the output
+    left_mic = 'mic_A'        # which mic is on the left  (usually = 'mic_A')
     frame_length = frame_size / (sampling_rate * 1000)  # sec
 
+    # ESP32 serial dataframe receiver
     r = Receiver(source, use_file=source_use_file)
-    sf = SoundFinder(r, sampling_rate, frame_size, mic_distance, normalize_signal, [filter_lowcut, filter_highcut, filter_order] if filter_on else None, average_delays, left_mic, [angle_middle_calib, angle_edge_calib], log_output, graph_samples)
+    # sound finding algorithm
+    sf = SoundFinder(r, sampling_rate, frame_size, mic_distance, normalize_signal, [filter_lowcut, filter_highcut, filter_order, filter_ratio, filter_bands, filter_graph] if filter_on else None, average_delays, left_mic, [angle_middle_calib, angle_edge_calib], log_output, graph_samples)
 
     # sampling loop
     first = True  # loop control
