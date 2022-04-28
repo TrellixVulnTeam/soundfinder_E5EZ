@@ -9,7 +9,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QThread
 
 from audio.python_receiver.receiver import Receiver
-from audio.python_receiver.audio import SoundFinder 
+from audio.python_receiver.audio_sound_finder import SoundFinder 
 from imaging.videoCaptureClass import VideoCapture
 from imaging.haarCascadeWArduino import angle_calculation
 from motors.motor_controller import MotorController
@@ -20,12 +20,14 @@ audio_mcu = "/dev/cu.SLAB_USBtoUART"
 motor_mcu = "/dev/cu.usbmodem0E22BD701"  # COM5
 imaging_camera = 2
 viewing_camera = 1
+max_imaged_people = 20
+
 
 videoCapture = VideoCapture(imaging_camera)
 def imagingFunc(array):
-    array_private = [-1,-1,-1]
+    array_private = [-1 for i in range(max_imaged_people)]
     while True:
-        array_private = [-1,-1,-1]
+        array_private = [-1 for i in range(max_imaged_people)]
         verifiedPeople = videoCapture.run()
         i=0
         for person in verifiedPeople:
@@ -70,7 +72,7 @@ if __name__ == "__main__":
     m = MotorController(motor_mcu)
     m.move(0)   # center the camera
 
-    arr = Array('d', [-1,-1,-1])
+    arr = Array('d', [-1 for i in range(max_imaged_people)])
     p1 = Process(target=imagingFunc, args=(arr,))
     #p2 = Process(target=audioFunc, args=(sf,))
     p1.start()
