@@ -192,7 +192,9 @@ if not cap.isOpened:
 framex = 640
 def angle_calculation(x):
     num = math.sqrt(((framex/2)**2)-((framex/2-x)**2))
-    denom = x-320
+    denom = x - 320
+    if denom == 0:
+        denom = 1
     angle = math.degrees(math.atan(num/denom))
     # return angle
     return angle * -1

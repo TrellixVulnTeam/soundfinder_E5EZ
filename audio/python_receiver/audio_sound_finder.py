@@ -112,8 +112,12 @@ class SoundFinder:
         y_b = self.data[:,1]
         # normalize signal data if chosen
         if self.normalize_signal:
-            y_a = (y_a - np.mean(y_a)) / np.std(y_a)
-            y_b = (y_b - np.mean(y_b)) / np.std(y_b)
+            y_a_div = np.std(y_a)
+            y_b_div = np.std(y_a)
+            y_a_div = y_a_div if y_a_div != 0 else 1
+            y_b_div = y_b_div if y_b_div != 0 else 1
+            y_a = (y_a - np.mean(y_a)) / y_a_div
+            y_b = (y_b - np.mean(y_b)) / y_b_div
         # filter signal data if chosen
         y_a_filt = None
         y_b_filt = None

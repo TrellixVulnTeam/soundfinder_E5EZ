@@ -46,14 +46,16 @@ class Person:
 
 class VideoCapture:
 
-    def __init__(self, cam_number = 0): 
+    def __init__(self, cam_number = 0, displayOn = True, frame_update_channel = None, faceDetectInterval = 3): 
         # distance = distance to qualify as same person
         # time = seconds where a face has to be > certain percent to qualify 
         # percent = percent of time a face has to be detected to qualify 
         self.distance = 50
-        self.time = 3
+        self.time = faceDetectInterval
         self.percent = .9
         self.cam_number = cam_number
+        self.displayOn = displayOn
+        self.frame_update_channel = frame_update_channel
 
     # Returns array of people
     def run(self): 
@@ -117,7 +119,10 @@ class VideoCapture:
         for(x,y,w,h) in bodies:
             bodyFound = True
             frame = cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        cv.imshow('Capture - Face and body detection', frame)
+        if self.frame_update_channel != None:
+            self.frame_update_channel.emit(frame)
+        if self.displayOn:
+            cv.imshow('Capture - Face and body detection', frame)
 
     # Create people array
     # Criteria: 
