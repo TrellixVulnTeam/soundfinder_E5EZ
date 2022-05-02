@@ -67,7 +67,7 @@ class VideoCapture:
             print('--(!)Error opening video capture')
             exit(0)
         startTime = time.time()
-        while time.time() - startTime < 4:
+        while time.time() - startTime < 4: # was 4 should this be self.time? or just 4
             ret, frame = cap.read()
             # resizing for faster detection
             frame = cv.resize(frame, (640, 480))

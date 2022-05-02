@@ -215,7 +215,7 @@ class SoundFinder:
             if ((not self.filter_on) or filter_angle_update) and avg_incident_mic == self.incident_mic:
             # if avg_incident_mic == self.incident_mic:
                 # old_incident_angle = self.incident_angle
-                self.incident_angle = ((1 - (filter_bands_avg_ratio / 100)) * self.incident_angle) + ((filter_bands_avg_ratio / 100) * band_avg_angle)
+                self.incident_angle = ((1 - (self.filter_bands_avg_ratio / 100)) * self.incident_angle) + ((self.filter_bands_avg_ratio / 100) * band_avg_angle)
                 # print('{} --> {} :({})'.format(round(old_incident_angle, 2), round(self.incident_angle, 2), round(band_avg_angle, 2)))
 
         # fine-tune value with calibration incident angle edge (extrapolate range)

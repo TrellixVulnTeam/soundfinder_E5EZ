@@ -19,9 +19,9 @@ from gui.SDUI import App
 
 # input settings
 audio_mcu = "/dev/cu.SLAB_USBtoUART"
-# motor_mcu = "/dev/cu.usbmodem0E22BD701"  # COM5
-motor_mcu = None
-imaging_camera = 1  # 2
+motor_mcu = "/dev/cu.usbmodem0E22BD701"  # COM5
+# motor_mcu = None
+imaging_camera = 2  # 2
 viewing_camera = 0  # 1
 max_imaged_people = 20
 motor_enable = False
@@ -29,6 +29,7 @@ imaging_audio_ratio = 70
 rolling_average_angles_num = 2
 maximum_imaging_audio_diff = 75
 maximum_straddling_angle_diff = 15
+face_detect_interval = 4 # 3-4 by default
 soundfinder_settings = {
     "sampling_rate": 16,        # kHz  -  MUST MATCH ESP              (ideal": 16 or 32)
     "frame_size": 512,          # #samples  -  MUST MATCH ESP         (ideal": 512 or 1024)
@@ -49,13 +50,13 @@ soundfinder_settings = {
     "graph_samples": False,     # generate plot (takes more time)
     "angle_edge_calib": 25,     # observed incident angle edge (to calibrate, update with incident angle with sound source at edge; 0 for no fine-tuning; usually between 15-45) (ideal": 25)
     "angle_middle_calib": 90,   # observed incident angle middle (should be 90)
-    "log_output": False,        # log the output
-    "left_mic": 'mic_A',        # which mic is on the left  (usually": 'mic_A')
+    "log_output": True,        # log the output
+    "left_mic": 'mic_B',        # which mic is on the left  (usually": 'mic_A', currently 'mic_B')
 }
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
-    a = App(viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff)
+    a = App(viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff, face_detect_interval)
     a.show()
     # block
     sys.exit(app.exec_())

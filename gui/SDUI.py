@@ -29,7 +29,10 @@ class AudioThread(QThread):
         sf = SoundFinder(r,
             self.sfs['sampling_rate'], self.sfs['frame_size'],
             self.sfs['mic_distance'], self.sfs['normalize_signal'],
-            [self.sfs['filter_lowcut'], self.sfs['filter_highcut'], self.sfs['filter_order'], self.sfs['filter_ratio'], self.sfs['filter_bands'], self.sfs['filter_graph'], self.sfs['filter_bands_avg_ratio'], self.sfs['filter_bands_order']] if self.sfs['filter_on'] else None,
+            [self.sfs['filter_lowcut'], self.sfs['filter_highcut'],
+                self.sfs['filter_order'], self.sfs['filter_ratio'], self.sfs['filter_bands'],
+                self.sfs['filter_graph'], self.sfs['filter_bands_avg_ratio'],
+                self.sfs['filter_bands_order']] if self.sfs['filter_on'] else None,
             self.sfs['average_delays'], self.sfs['left_mic'],
             [self.sfs['angle_middle_calib'], self.sfs['angle_edge_calib']],
             self.sfs['log_output'], self.sfs['graph_samples'])
@@ -39,6 +42,7 @@ class AudioThread(QThread):
             # imagingAngle = 90
             # finalAngle = 90
             sfAngle, sfMic = sf.next_angle()  # get next/current angle
+            # print("***** {} {}".format(sfAngle, sfMic))
             audioAngle = sf.convert_angle(sfAngle, sfMic)
             # audioAngle = 90
 
@@ -53,15 +57,16 @@ class ImagingThread(QThread):
     people_angles_signal = pyqtSignal(list)
     change_pixmap_signal = pyqtSignal(np.ndarray)
 
-    def __init__(self, imaging_camera, max_imaged_people):
+    def __init__(self, imaging_camera, max_imaged_people, face_detect_interval = 3):
         super().__init__()
         self._run_flag = True
         self.imaging_camera = imaging_camera
         self.max_imaged_people = max_imaged_people
         self.videoCapture = None
+        self.face_detect_interval = face_detect_interval
 
     def run(self):
-        self.videoCapture = VideoCapture(self.imaging_camera, False, self.change_pixmap_signal)
+        self.videoCapture = VideoCapture(self.imaging_camera, False, self.change_pixmap_signal, self.face_detect_interval)
         array_private = [-1 for i in range(self.max_imaged_people)]
         while self._run_flag:
             array_private = [-1 for i in range(self.max_imaged_people)]
@@ -78,22 +83,38 @@ class ImagingThread(QThread):
         self.wait()
 
 class VideoThread(QThread):
+    people_angles_signal = pyqtSignal(list)
     change_pixmap_signal = pyqtSignal(np.ndarray)
 
-    def __init__(self, viewing_camera):
+    def __init__(self, viewing_camera, max_imaged_people, face_detect_interval = 3):
         super().__init__()
         self._run_flag = True
         self.viewing_camera = viewing_camera
 
+        self.videoCapture = None
+        self.max_imaged_people = max_imaged_people
+        self.face_detect_interval = face_detect_interval
+
     def run(self):
-        # capture from web cam
-        cap = cv2.VideoCapture(self.viewing_camera)
+        # # capture from web cam
+        # cap = cv2.VideoCapture(self.viewing_camera)
+        # while self._run_flag:
+        #     ret, cv_img = cap.read()
+        #     if ret:
+        #         self.change_pixmap_signal.emit(cv_img)
+        # # shut down capture system
+        # cap.release()
+        self.videoCapture = VideoCapture(self.viewing_camera, False, self.change_pixmap_signal, self.face_detect_interval)
+        array_private = [-1 for i in range(self.max_imaged_people)]
         while self._run_flag:
-            ret, cv_img = cap.read()
-            if ret:
-                self.change_pixmap_signal.emit(cv_img)
-        # shut down capture system
-        cap.release()
+            array_private = [-1 for i in range(self.max_imaged_people)]
+            verifiedPeople = self.videoCapture.run()
+            i = 0
+            for person in verifiedPeople:
+                array_private[i] = angle_calculation(person.x)
+                # print(f"{person} with angle {angle_calculation(person.x)}")
+                i = i + 1
+            self.people_angles_signal.emit(array_private)
 
     def stop(self):
         """Sets run flag to False and waits for thread to finish"""
@@ -126,13 +147,14 @@ class TranscriptionThread(QThread):
 
 
 class App(QWidget):
-    def __init__(self, viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff):
+    def __init__(self, viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff, face_detect_interval):
         super().__init__()
         self.setWindowTitle("Where Is The Sound")
         self.display_width = 1280
         self.display_height = 700
         # people angles list
         self.people_angle_list = []
+        self.people_secondary_angle_list = []
         self.rolling_average_angles = []
         self.sfs = soundfinder_settings
         self.max_imaged_people = max_imaged_people
@@ -142,6 +164,7 @@ class App(QWidget):
         self.maximum_straddling_angle_diff = maximum_straddling_angle_diff
         self.motor_mcu = motor_mcu
         self.motor_controller = None
+        self.audio_angle = 0
         # create the label that holds the image
         self.image_height_offset = 315
         self.image_width = self.display_width / 2
@@ -174,26 +197,27 @@ class App(QWidget):
         self.audio_thread.start()
 
         # create the video capture thread
-        self.video_thread = VideoThread(viewing_camera)
+        self.video_thread = VideoThread(viewing_camera, max_imaged_people, face_detect_interval)
         # connect its signal to the update_image slot
         self.video_thread.change_pixmap_signal.connect(self.update_image)
+        self.video_thread.people_angles_signal.connect(self.update_people_secondary)
         # start the thread
         self.video_thread.start()
 
         # create the imaging capture thread
-        self.img_thread = ImagingThread(imaging_camera, max_imaged_people)
+        self.img_thread = ImagingThread(imaging_camera, max_imaged_people, face_detect_interval)
         # connect its signal to the update_image slot
         self.img_thread.change_pixmap_signal.connect(self.update_image_2)
         self.img_thread.people_angles_signal.connect(self.update_people)
         # start the thread
         self.img_thread.start()
 
-        # create the transcription thread
-        self.tc_thread = TranscriptionThread()
-        # connect its signal to the update_image slot
-        self.tc_thread.update_caption_line.connect(self.update_transcription)
-        # start the thread
-        self.tc_thread.start()
+        # # create the transcription thread
+        # self.tc_thread = TranscriptionThread()
+        # # connect its signal to the update_image slot
+        # self.tc_thread.update_caption_line.connect(self.update_transcription)
+        # # start the thread
+        # self.tc_thread.start()
 
         # start motor control
         if self.motor_mcu != None:
@@ -215,6 +239,7 @@ class App(QWidget):
 
     @pyqtSlot(float)
     def update_audio_angle(self, audio_angle):
+        self.audio_angle = audio_angle
         self.trigger_angle_update(audio_angle, self.people_angle_list)
 
     @pyqtSlot(np.ndarray)
@@ -241,6 +266,20 @@ class App(QWidget):
         #     print("{} ".format(a), end="")
         # print("] ")
         self.people_angle_list = public_arr
+        self.trigger_angle_update(self.audio_angle, public_arr, self.people_secondary_angle_list)
+
+    @pyqtSlot(list)
+    def update_people_secondary(self, people_angles_secondary):
+        # print("secondary people angles: ", end="")
+        # print("[ ", end="")
+        public_arr = []
+        for a in people_angles_secondary:
+            if a == -1: continue
+            public_arr.append(a)
+        #     print("{} ".format(a), end="")
+        # print("] ")
+        self.people_angle_list = public_arr
+        self.trigger_angle_update(self.audio_angle, self.people_angle_list, public_arr)
     
     @pyqtSlot(str)
     def update_transcription(self, caption_line):
@@ -257,8 +296,8 @@ class App(QWidget):
         p = convert_to_Qt_format.scaled(self.image_width, self.image_height)
         return QPixmap.fromImage(p)
 
-    def trigger_angle_update(self, audio_angle, people_angles):
-        print("audio_angle={}\npeople_angles={}".format(audio_angle, people_angles))
+    def trigger_angle_update(self, audio_angle, people_angles, people_angles_secondary = []):
+        print("audio_angle={}\npeople_angles={}\npeople_angles_secondary={}".format(audio_angle, people_angles, people_angles_secondary))
         numImgPeople = 0
         bestImgDiff = np.inf
         bestImgAngle = audio_angle
@@ -301,7 +340,7 @@ class App(QWidget):
 
         self.update_motor_angle(finalAngle)
     
-if __name__=="__main__":
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     a = App()
     a.show()
