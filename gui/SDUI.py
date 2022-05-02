@@ -7,9 +7,11 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QThread
 from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QHBoxLayout
 
+from audio.transcription.transcribe import TranscriptionClient
 from audio.python_receiver.receiver import Receiver
-from audio.python_receiver.audio_sound_finder import SoundFinder 
+from audio.python_receiver.audio_sound_finder import SoundFinder
 from imaging.haarCascadeWArduino import angle_calculation
+from motors.motor_controller import MotorController
 from imaging.videoCaptureClass import VideoCapture
 
 
@@ -38,7 +40,7 @@ class AudioThread(QThread):
             # finalAngle = 90
             sfAngle, sfMic = sf.next_angle()  # get next/current angle
             audioAngle = sf.convert_angle(sfAngle, sfMic)
-            audioAngle = 90
+            # audioAngle = 90
 
             self.audio_angle_signal.emit(audioAngle)
 
@@ -46,6 +48,7 @@ class AudioThread(QThread):
         """Sets run flag to False and waits for thread to finish"""
         self._run_flag = False
         self.wait()
+
 class ImagingThread(QThread):
     people_angles_signal = pyqtSignal(list)
     change_pixmap_signal = pyqtSignal(np.ndarray)
@@ -97,6 +100,29 @@ class VideoThread(QThread):
         self._run_flag = False
         self.wait()
 
+class TranscriptionThread(QThread):
+    update_caption_line = pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__()
+        self._run_flag = True
+        self.transcription_client = None
+
+    def run(self):
+        self.transcription_client = TranscriptionClient(self.update_caption_line, False)
+        while self._run_flag:
+            try:
+                self.transcription_client.transcribe()
+            except:
+                if not self._run_flag:
+                    return
+
+    def stop(self):
+        """Sets run flag to False and waits for thread to finish"""
+        self._run_flag = False
+        self.transcription_client.stop()
+        self.wait()
+
 
 
 class App(QWidget):
@@ -114,6 +140,8 @@ class App(QWidget):
         self.rolling_average_angles_num = rolling_average_angles_num
         self.maximum_imaging_audio_diff = maximum_imaging_audio_diff
         self.maximum_straddling_angle_diff = maximum_straddling_angle_diff
+        self.motor_mcu = motor_mcu
+        self.motor_controller = None
         # create the label that holds the image
         self.image_height_offset = 315
         self.image_width = self.display_width / 2
@@ -124,7 +152,9 @@ class App(QWidget):
         self.image_label_2.resize(self.image_width,self.image_height)
 
         # create a text label
-        self.textLabel = QLabel('Webcam')
+        self.textLabel = QLabel('Where Is The Sound?')
+        self.textLabel.setAlignment(Qt.AlignCenter)
+
 
         # create a vertical box layout and add the two labels
         self.vbox = QVBoxLayout()
@@ -158,11 +188,30 @@ class App(QWidget):
         # start the thread
         self.img_thread.start()
 
+        # create the transcription thread
+        self.tc_thread = TranscriptionThread()
+        # connect its signal to the update_image slot
+        self.tc_thread.update_caption_line.connect(self.update_transcription)
+        # start the thread
+        self.tc_thread.start()
+
+        # start motor control
+        if self.motor_mcu != None:
+            self.motor_controller = MotorController(self.motor_mcu)
+            self.motor_controller.move(0)   # center the camera
+
     def closeEvent(self, event):
+        self.audio_thread.stop()
         self.video_thread.stop()
         self.img_thread.stop()
+        self.tc_thread.stop()
         event.accept()
 
+    def update_motor_angle(self, motor_angle):
+        motor_angle = int(round(motor_angle * 10, 0))
+        print("motor angle = {}".format(motor_angle))
+        if self.motor_mcu != None and self.motor_controller != None:
+            self.motor_controller.move(motor_angle)
 
     @pyqtSlot(float)
     def update_audio_angle(self, audio_angle):
@@ -193,6 +242,11 @@ class App(QWidget):
         # print("] ")
         self.people_angle_list = public_arr
     
+    @pyqtSlot(str)
+    def update_transcription(self, caption_line):
+        print("captions: '{}'".format(caption_line))
+        self.textLabel.setText((str(caption_line)).replace(". ", ".  "))
+    
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
         rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
@@ -204,7 +258,7 @@ class App(QWidget):
         return QPixmap.fromImage(p)
 
     def trigger_angle_update(self, audio_angle, people_angles):
-        print("audio_angle={}, people_angles={}".format(audio_angle, people_angles))
+        print("audio_angle={}\npeople_angles={}".format(audio_angle, people_angles))
         numImgPeople = 0
         bestImgDiff = np.inf
         bestImgAngle = audio_angle
@@ -238,12 +292,14 @@ class App(QWidget):
         finalAngle = ((self.imaging_audio_ratio / 100) * imagingAngle) + ((1 - (self.imaging_audio_ratio / 100)) * audio_angle)
         # print('audio_angle={}'.format(audioAngle))
         # print('imaging_angle={}'.format(imagingAngle))
-        print(f"final angle={finalAngle}")
+        # print(f"final angle={finalAngle}")
 
         self.rolling_average_angles.append(finalAngle)
         if len(self.rolling_average_angles) > self.rolling_average_angles_num:
             self.rolling_average_angles = self.rolling_average_angles[1:]
         finalAngle = np.mean(self.rolling_average_angles)
+
+        self.update_motor_angle(finalAngle)
     
 if __name__=="__main__":
     app = QApplication(sys.argv)

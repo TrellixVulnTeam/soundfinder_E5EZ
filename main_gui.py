@@ -8,8 +8,9 @@ from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QThread
 
+from audio.transcription import transcribe
 from audio.python_receiver.receiver import Receiver
-from audio.python_receiver.audio_sound_finder import SoundFinder 
+from audio.python_receiver.audio_sound_finder import SoundFinder
 from imaging.videoCaptureClass import VideoCapture
 from imaging.haarCascadeWArduino import angle_calculation
 from motors.motor_controller import MotorController
@@ -18,7 +19,8 @@ from gui.SDUI import App
 
 # input settings
 audio_mcu = "/dev/cu.SLAB_USBtoUART"
-motor_mcu = "/dev/cu.usbmodem0E22BD701"  # COM5
+# motor_mcu = "/dev/cu.usbmodem0E22BD701"  # COM5
+motor_mcu = None
 imaging_camera = 1  # 2
 viewing_camera = 0  # 1
 max_imaged_people = 20
@@ -55,4 +57,5 @@ if __name__=="__main__":
     app = QApplication(sys.argv)
     a = App(viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff)
     a.show()
+    # block
     sys.exit(app.exec_())
