@@ -47,7 +47,7 @@ filter_bands = [ [550,750], [650,850], [400,500], [500,600], [600,700], [700,800
 filter_bands_avg_ratio = 10 # %                                 (ideal = 15-20)
 filter_graph = False      # display filtered or unfiltered signal frame on graph
 repeat = True             # sample forever or only once
-graph_samples = False     # generate plot (takes more time)
+graph_samples = True     # generate plot (takes more time)
 angle_edge_calib = 25     # observed incident angle edge (to calibrate, update with incident angle with sound source at edge; 0 for no fine-tuning; usually between 15-45) (ideal = 25)
 angle_middle_calib = 90   # observed incident angle middle (should be 90)
 log_output = False        # log the output

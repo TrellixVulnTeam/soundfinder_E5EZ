@@ -147,7 +147,7 @@ class TranscriptionThread(QThread):
 
 
 class App(QWidget):
-    def __init__(self, viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff, face_detect_interval):
+    def __init__(self, viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff, face_detect_interval, secondary_imaging_ratio):
         super().__init__()
         self.setWindowTitle("Where Is The Sound")
         self.display_width = 1280
@@ -162,6 +162,7 @@ class App(QWidget):
         self.rolling_average_angles_num = rolling_average_angles_num
         self.maximum_imaging_audio_diff = maximum_imaging_audio_diff
         self.maximum_straddling_angle_diff = maximum_straddling_angle_diff
+        self.secondary_imaging_ratio = secondary_imaging_ratio
         self.motor_mcu = motor_mcu
         self.motor_controller = None
         self.audio_angle = 0
@@ -212,12 +213,12 @@ class App(QWidget):
         # start the thread
         self.img_thread.start()
 
-        # # create the transcription thread
-        # self.tc_thread = TranscriptionThread()
-        # # connect its signal to the update_image slot
-        # self.tc_thread.update_caption_line.connect(self.update_transcription)
-        # # start the thread
-        # self.tc_thread.start()
+        # create the transcription thread
+        self.tc_thread = TranscriptionThread()
+        # connect its signal to the update_image slot
+        self.tc_thread.update_caption_line.connect(self.update_transcription)
+        # start the thread
+        self.tc_thread.start()
 
         # start motor control
         if self.motor_mcu != None:
@@ -240,7 +241,7 @@ class App(QWidget):
     @pyqtSlot(float)
     def update_audio_angle(self, audio_angle):
         self.audio_angle = audio_angle
-        self.trigger_angle_update(audio_angle, self.people_angle_list)
+        self.trigger_angle_update(audio_angle, self.people_angle_list, self.people_secondary_angle_list)
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
@@ -278,7 +279,7 @@ class App(QWidget):
             public_arr.append(a)
         #     print("{} ".format(a), end="")
         # print("] ")
-        self.people_angle_list = public_arr
+        self.people_secondary_angle_list = public_arr
         self.trigger_angle_update(self.audio_angle, self.people_angle_list, public_arr)
     
     @pyqtSlot(str)
@@ -332,6 +333,18 @@ class App(QWidget):
         # print('audio_angle={}'.format(audioAngle))
         # print('imaging_angle={}'.format(imagingAngle))
         # print(f"final angle={finalAngle}")
+
+        # modify with second camera's imaging
+        closestToMiddle = -1
+        minDiff = np.inf
+        if len(people_angles_secondary) > 0:
+            for secondaryPersonAngle in people_angles_secondary:
+                diff = abs(secondaryPersonAngle - 90)
+                if diff < minDiff:
+                    minDiff = diff
+                    closestToMiddle = secondaryPersonAngle
+            finalAngle += (closestToMiddle - 90) * (self.secondary_imaging_ratio / 100)
+        
 
         self.rolling_average_angles.append(finalAngle)
         if len(self.rolling_average_angles) > self.rolling_average_angles_num:

@@ -22,10 +22,11 @@ audio_mcu = "/dev/cu.SLAB_USBtoUART"
 motor_mcu = "/dev/cu.usbmodem0E22BD701"  # COM5
 # motor_mcu = None
 imaging_camera = 2  # 2
-viewing_camera = 0  # 1
+viewing_camera = 1  # 1
 max_imaged_people = 20
 motor_enable = False
-imaging_audio_ratio = 70
+imaging_audio_ratio = 60  # was 70
+secondary_imaging_ratio = 20  # try diff amounts
 rolling_average_angles_num = 2
 maximum_imaging_audio_diff = 75
 maximum_straddling_angle_diff = 15
@@ -56,7 +57,7 @@ soundfinder_settings = {
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
-    a = App(viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff, face_detect_interval)
+    a = App(viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff, face_detect_interval, secondary_imaging_ratio)
     a.show()
     # block
     sys.exit(app.exec_())
