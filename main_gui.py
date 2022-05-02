@@ -53,6 +53,6 @@ soundfinder_settings = {
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
-    a = App(viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings)
+    a = App(viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff)
     a.show()
     sys.exit(app.exec_())

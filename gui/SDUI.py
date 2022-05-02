@@ -100,13 +100,20 @@ class VideoThread(QThread):
 
 
 class App(QWidget):
-    def __init__(self, viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings):
+    def __init__(self, viewing_camera, imaging_camera, audio_mcu, motor_mcu, max_imaged_people, soundfinder_settings, imaging_audio_ratio, rolling_average_angles_num, maximum_imaging_audio_diff, maximum_straddling_angle_diff):
         super().__init__()
         self.setWindowTitle("Where Is The Sound")
         self.display_width = 1280
         self.display_height = 700
         # people angles list
         self.people_angle_list = []
+        self.rolling_average_angles = []
+        self.sfs = soundfinder_settings
+        self.max_imaged_people = max_imaged_people
+        self.imaging_audio_ratio = imaging_audio_ratio
+        self.rolling_average_angles_num = rolling_average_angles_num
+        self.maximum_imaging_audio_diff = maximum_imaging_audio_diff
+        self.maximum_straddling_angle_diff = maximum_straddling_angle_diff
         # create the label that holds the image
         self.image_height_offset = 315
         self.image_width = self.display_width / 2
@@ -198,7 +205,45 @@ class App(QWidget):
 
     def trigger_angle_update(self, audio_angle, people_angles):
         print("audio_angle={}, people_angles={}".format(audio_angle, people_angles))
-        # pass
+        numImgPeople = 0
+        bestImgDiff = np.inf
+        bestImgAngle = audio_angle
+        secondBestImgDiff = np.inf
+        secondBestImgAngle = audio_angle
+        # print("[", end='')
+        for personAngle in people_angles:
+            if personAngle == -1: continue
+            numImgPeople += 1
+            # print("{}, ".format(personAngle), end='')
+            diff = abs(audio_angle - personAngle)
+            if diff < bestImgDiff:  # and diff < maxDiff:
+                bestImgDiff = diff
+                bestImgAngle = personAngle
+            elif diff < secondBestImgDiff:  # and diff < maxDiff:
+                secondBestImgDiff = diff
+                secondBestImgAngle = personAngle
+            # print('angle={},diff={}'.format(angle,diff))
+        # print("] --> {}".format(numImgPeople))
+        if numImgPeople == 0:
+            imagingAngle = audio_angle
+        elif numImgPeople == 1:
+            imagingAngle = bestImgAngle
+            # imagingAngle = arr[0]
+        elif numImgPeople >= 2:
+            if bestImgDiff <= self.maximum_straddling_angle_diff and secondBestImgDiff <= self.maximum_straddling_angle_diff:
+                imagingAngle = (bestImgAngle + secondBestImgAngle) / 2
+            else:
+                imagingAngle = bestImgAngle
+
+        finalAngle = ((self.imaging_audio_ratio / 100) * imagingAngle) + ((1 - (self.imaging_audio_ratio / 100)) * audio_angle)
+        # print('audio_angle={}'.format(audioAngle))
+        # print('imaging_angle={}'.format(imagingAngle))
+        print(f"final angle={finalAngle}")
+
+        self.rolling_average_angles.append(finalAngle)
+        if len(self.rolling_average_angles) > self.rolling_average_angles_num:
+            self.rolling_average_angles = self.rolling_average_angles[1:]
+        finalAngle = np.mean(self.rolling_average_angles)
     
 if __name__=="__main__":
     app = QApplication(sys.argv)
